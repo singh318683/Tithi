@@ -393,6 +393,83 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
   .cal2 .dn{font-size:14px}
 }
 @media (max-height:640px){ .nextrow{display:none} .tmeta{display:none} }
+
+/* ===== Panel pages: one screen each ===== */
+.panel{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+.panel[hidden]{display:none!important}
+.panelbar{position:relative;flex:none}
+#panelTitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.panelbody.fit{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px;overflow:hidden;padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.fit > *{flex:none}
+.fit > .fill{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain}
+.seg{display:flex;gap:4px;background:var(--sunk);border-radius:12px;padding:3px;overflow-x:auto;scrollbar-width:none}
+.seg button{flex:1;border:0;background:transparent;border-radius:9px;padding:7px 8px;font-weight:600;font-size:13px;white-space:nowrap;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.card.fill{padding:12px 14px}
+.card.fill dl.rows{gap:9px 12px}
+.morehead{margin:0}
+.morehead .dev{font-size:32px}
+.fit .parana{margin:0;padding:8px 12px;font-size:14px}
+.mnav{display:flex;align-items:center;justify-content:space-between}
+.mnav b{font-size:16px}
+.flist2{list-style:none;margin:0;padding:0;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.flist2 li{display:grid;grid-template-columns:44px 1fr auto;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+.flist2 li:last-child{border-bottom:0}
+.flist2 li.empty{display:block;color:var(--muted);cursor:default}
+.flist2 .d{display:flex;flex-direction:column;align-items:center;line-height:1.1}
+.flist2 .d b{font-size:18px}
+.flist2 .d small{font-size:11px;color:var(--muted)}
+.flist2 .n{font-weight:600;font-size:14px;line-height:1.25}
+.flist2 .n small{display:block;font-weight:400;color:var(--muted);font-size:14px}
+.flist2 .t{font-size:12px;color:var(--kumkum);font-weight:700}
+.gtiles{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:8px;overflow:hidden!important}
+.gtile{display:flex;flex-direction:column;justify-content:center;gap:1px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px 12px;cursor:pointer;min-height:0;overflow:hidden}
+.gtile .dev{font-size:21px;line-height:1.2;color:var(--kumkum)}
+.gtile b{font-size:13.5px;line-height:1.2}
+.gtile small{font-size:11.5px;color:var(--muted)}
+.hint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.4}
+.ghead{display:flex;flex-direction:column}
+.ghead .dev{font-size:clamp(30px,9vw,38px);line-height:1.15}
+.ghead.sm .dev{font-size:24px}
+.ghead .sub{font-size:13px}
+.about{margin:0;font-size:14px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.nextdates{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.nextdates span{white-space:nowrap}
+.stiles{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:8px;overflow:hidden!important;max-height:340px}
+.stile{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:2px;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--kumkum);border-radius:14px;padding:8px 14px;cursor:pointer;text-align:left;min-height:0}
+.stile b{font-size:16px}
+.stile small{color:var(--muted);font-size:12.5px}
+.stile:nth-child(1){border-left-color:var(--peacock)}
+.blist{margin:0;padding:12px 14px 12px 32px;background:var(--surface);border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.types{display:flex!important;flex-direction:column;gap:8px}
+.types div{font-size:14.5px}
+.food{display:flex;flex-direction:column;gap:8px}
+.food .card{padding:10px 14px}
+.food .card h3{margin-bottom:4px}
+.food ul{margin:0;padding-left:18px;font-size:14px}
+.food .ok{border-top:3px solid var(--peacock)} .food .no{border-top:3px solid var(--kumkum)}
+.mantras{display:flex;flex-direction:column;gap:8px}
+.mantras .mantra{margin:0;padding:12px 14px}
+.mantras .mantra .dev{font-size:21px}
+.big{font-size:16px;line-height:1.55;margin:0 0 10px}
+.fill .note{margin:0}
+.pdots{display:flex;gap:5px;justify-content:center}
+.pdots span{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.pdots span.done{background:var(--peacock)}
+.pdots span.cur{background:var(--kumkum);transform:scale(1.3)}
+.stepcard{display:flex;flex-direction:column;justify-content:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 18px}
+.stepcard .sn{width:44px;height:44px;border-radius:50%;background:var(--kumkum-soft);color:var(--kumkum);font-weight:700;font-size:20px;display:grid;place-items:center}
+.stepcard h3{margin:0;font-size:21px;line-height:1.25}
+.stepcard p{margin:0;font-size:16px;line-height:1.55}
+.donebtn{align-self:flex-start;border:1px solid var(--peacock);background:transparent;color:var(--peacock);border-radius:999px;padding:7px 16px;font-weight:600;cursor:pointer}
+.donebtn.on{background:var(--peacock);color:var(--surface)}
+.pager{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+.pager .primary{padding:12px}
+.ghost{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px;font-weight:600;cursor:pointer}
+.ghost:disabled{opacity:.4}
+.linkbtn.center{align-self:center}
+@media (max-height:640px){.about{-webkit-line-clamp:2}.ghead .dev{font-size:26px}.stepcard p{font-size:15px}.gtile .dev{font-size:18px}}
+
 /* very short screens (landscape, small phones): allow scrolling as a fallback */
 @media (max-height:560px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.content{overflow:visible}.cal2{min-height:300px}}
 </style>
@@ -1283,45 +1360,6 @@ function renderDay() {
   ${next ? `<button type="button" class="nextrow" data-date="${keyOf(next[1])}"><span class="dot ${next[2].kind}"></span><span class="nx">Next: <b>${esc(next[2].name)}</b></span><span class="num nd">${next[0] === 1 ? 'Tomorrow' : MON[next[1].m] + ' ' + next[1].d}</span></button>` : ''}`;
 }
 
-function renderMore() {
-  const s = S.sel, f = S.f || P.fullDay(s.y, s.m, s.d, S.loc), pk = paksha(f.tithi), obs = obsOn(s), ml = monthLabel(f, f.tithi);
-  const x = dayExtras(s, f, obs);
-  let notes = '';
-  if (x.pr) notes += `<div class="parana"><b>${x.ekToday ? 'Parana tomorrow' : 'Ekadashi parana today'}</b> (${WD[new Date(Date.UTC(x.pr.day.y, x.pr.day.m, x.pr.day.d)).getUTCDay()]}, ${MON[x.pr.day.m]} ${x.pr.day.d}): <span class="num"><b>${fmtT(x.pr.start)} – ${fmtT(x.pr.end)}</b></span>. Hari Vasara ends ${fmtT(x.pr.hv, x.pr.day)}. ${x.pr.note}</div>`;
-  if (x.moonFast) notes += `<div class="parana" style="border-color:var(--night);background:var(--night-soft)"><b style="color:var(--night)">Moonrise for arghya:</b> <span class="num"><b>${fmtT(f.moonrise)}</b></span> in ${esc(S.loc.name)}. Break the fast after offering arghya to the moon.</div>`;
-  setPanel(`Panchang · ${MON[s.m]} ${s.d}`, `
-  <div class="morehead"><span class="dev">${P.tithiNameHi(f.tithi)}</span><span>${WD_FULL[f.wd]}, ${MONTH_FULL[s.m]} ${s.d}, ${s.y}</span></div>
-  <p class="sub" style="margin:0 0 12px">${ml.en} ${pk} paksha · Vikram Samvat ${vikram(f)} · Shaka ${vikram(f) - 135} · ${esc(S.loc.name)}</p>
-  ${notes}
-  <div class="grid2">
-    <div class="card"><h3>Panchang at sunrise</h3>
-      <dl class="rows num">
-        <dt>Tithi</dt><dd>${pk} ${P.tithiName(f.tithi)}<small>${fmtT(f.tStart, s)} → ${fmtT(f.tEnd, s)}, then ${P.tithiName(f.tNext)}</small></dd>
-        <dt>Nakshatra</dt><dd>${P.NAK[f.nak]}<small>till ${fmtT(f.nEnd, s)} · then ${P.NAK[f.nNext]}</small></dd>
-        <dt>Yoga</dt><dd>${P.YOGA[f.yoga]}<small>till ${fmtT(f.yEnd, s)}</small></dd>
-        <dt>Karana</dt><dd>${P.karanaName(f.karana)}<small>till ${fmtT(f.kEnd, s)}</small></dd>
-        <dt>Vaara</dt><dd>${P.VAARA[f.wd]} <span class="dev">${P.VAARA_HI[f.wd]}</span></dd>
-        <dt>Sun sign</dt><dd>${P.RASHI[f.sunRashi]}</dd>
-        <dt>Moon sign</dt><dd>${P.RASHI[f.moonRashi]}</dd>
-      </dl>
-    </div>
-    <div class="card"><h3>Sun, moon &amp; muhurat</h3>
-      <dl class="rows num">
-        <dt>Sunrise</dt><dd>${fmtT(f.rise, s)}</dd>
-        <dt>Sunset</dt><dd>${fmtT(f.set, s)}</dd>
-        <dt>Moonrise</dt><dd>${f.moonrise ? fmtT(f.moonrise, s) : 'No moonrise this date'}</dd>
-        <dt>Moonset</dt><dd>${f.moonset ? fmtT(f.moonset, s) : 'No moonset this date'}</dd>
-        <dt>Moon</dt><dd>${Math.round(f.illum * 100)}% lit, ${f.elong < 180 ? 'waxing' : 'waning'}</dd>
-        <dt>Brahma muhurta</dt><dd class="good">${fmtRange(f.brahma, s)}</dd>
-        <dt>Abhijit muhurta</dt><dd class="good">${f.wd === 3 ? '<small>Not used on Wednesday</small>' : fmtRange(f.abhijit, s)}</dd>
-        <dt>Rahu kaal</dt><dd class="bad">${fmtRange(f.rahu, s)}</dd>
-        <dt>Yamaganda</dt><dd class="bad">${fmtRange(f.yama, s)}</dd>
-        <dt>Gulika kaal</dt><dd class="bad">${fmtRange(f.gulika, s)}</dd>
-      </dl>
-    </div>
-  </div>`);
-}
-
 /* ---------- Month (fills remaining screen) ---------- */
 function renderMonth() {
   const { y, m } = S.cal, L = S.loc, t = todayIn(L.tz);
@@ -1350,122 +1388,176 @@ function renderMonth() {
   <div class="cal2" style="--rows:${rows}">${cells}</div>`;
 }
 
-/* ---------- Vrat guides list (panel) ---------- */
-function renderGuides() {
-  setPanel('Vrat vidhi · Fasting guides', `
-    <div class="note">Every vrat starts with a <b>sankalp</b>: after bathing, hold water in your right palm, say your name, the day and why you are keeping the fast, then let the water fall. A lighter fast kept with devotion is better than a strict one you cannot finish.</div>
-    <div class="gcards">${Object.entries(GUIDES).map(([k, v]) => `<button type="button" class="gcard" data-guide="${k}"><span class="dev">${v.hi}</span><b>${v.name}</b><small>${v.deity} · ${v.freq}</small></button>`).join('')}</div>`);
-}
+/* ---------- Panel pages: each fits one screen; more detail = another page ---------- */
+const GROUPS = [
+  ['monthly', 'Monthly', ['ekadashi', 'purnima', 'amavasya', 'pradosh', 'sankashti', 'shivaratri']],
+  ['festival', 'Festival', ['navratri', 'janmashtami', 'karvachauth', 'teej', 'ahoi', 'chhath', 'vatsavitri', 'ramnavami']],
+  ['weekly', 'Weekly', ['somvar', 'mangalvar', 'guruvar', 'shukravar', 'shanivar']],
+];
+const SECS = [
+  ['steps', 'Vidhi', 'Step by step'], ['samagri', 'Samagri', 'Puja items'], ['food', 'Food', 'Eat & avoid'],
+  ['types', 'Ways to keep', 'Types of fast'], ['mantra', 'Mantra', 'Chant'], ['parana', 'Parana', 'Breaking the fast'],
+];
+const FILTERS = [['major', 'Major'], ['vrat', 'Fasts'], ['ekadashi', 'Ekadashi'], ['monthly', 'Monthly'], ['all', 'All']];
+S.stack = [];
+const top_ = () => S.stack[S.stack.length - 1];
+function seg(items, cur, attr) { return `<div class="seg">${items.map(([k, l]) => `<button type="button" ${attr}="${k}" aria-pressed="${k === cur}">${l}</button>`).join('')}</div>`; }
+function setPanel(title, html, cls = '') { $('#panelTitle').textContent = title; const b = $('#panelBody'); b.className = 'panelbody ' + cls; b.innerHTML = html; }
 
-/* ---------- Festivals view ---------- */
-const FILTERS = [['major', 'Major'], ['vrat', 'Fasts'], ['ekadashi', 'Ekadashi'], ['monthly', 'Monthly vrats'], ['solar', 'Sankranti'], ['all', 'Everything']];
-function renderFest() {
-  const y = S.festYear, list = obsYear(y).list;
-  const fil = S.festFilter;
-  const pass = o => fil === 'all' ? true : fil === 'major' ? !o.recurring && (o.kind !== 'solar') : fil === 'vrat' ? o.kind === 'vrat' : fil === 'ekadashi' ? o.recurring === 'ekadashi' : fil === 'monthly' ? !!o.recurring : o.kind === 'solar' || /Sankranti/.test(o.name);
-  const t = todayIn(S.loc.tz);
-  let html = '';
-  for (let m = 0; m < 12; m++) {
-    const items = list.filter(o => o.b.m === m && o.b.y === y && pass(o));
-    if (!items.length) continue;
-    html += `<div class="fmonth"><h3>${MONTH_FULL[m]}</h3><ul class="flist">${items.map(o => {
-      const od = { y: o.b.y, m: o.b.m, d: o.b.d }; const dd = dayDiff(t, od);
-      const ml = monthLabel(o.b, o.b.ti.sunrise);
-      return `<li data-date="${keyOf(od)}"><span class="d num">${MON[m]} ${od.d}<small>${WD[o.b.wd]}</small></span><span class="n"><span class="dot ${o.kind}"></span>${esc(o.name)}<small>${esc(o.hi)}</small></span><span class="t">${dd === 0 ? 'Today' : dd > 0 ? `in ${dd} days` : ml.en}</span></li>`;
-    }).join('')}</ul></div>`;
-  }
-  setPanel('Festivals & vrats', `
-  <div class="filters">${FILTERS.map(([k, l]) => `<button type="button" data-filter="${k}" aria-pressed="${k === fil}">${l}</button>`).join('')}
-    <select id="fyear" aria-label="Year">${[y - 1, y, y + 1, y + 2].map(v => `<option${v === y ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
-  ${html || '<p class="loading">Nothing in this filter for the year.</p>'}`);
-}
-
-/* ---------- Vrat guides ---------- */
 function nextDatesFor(key) {
   const t = todayIn(S.loc.tz), out = [];
   const wdIdx = WEEKLY.indexOf(key);
-  if (wdIdx > 0) { for (let i = 0; out.length < 5 && i < 14; i++) { const o = addDays(t, i); if (new Date(Date.UTC(o.y, o.m, o.d)).getUTCDay() === wdIdx) out.push([o, '']); } return out; }
+  if (wdIdx > 0) { for (let i = 0; out.length < 4 && i < 30; i++) { const o = addDays(t, i); if (new Date(Date.UTC(o.y, o.m, o.d)).getUTCDay() === wdIdx) out.push([o, '']); } return out; }
   for (const y of [t.y, t.y + 1]) for (const o of obsYear(y).list) { if (o.g !== key) continue; const od = { y: o.b.y, m: o.b.m, d: o.b.d }; if (dayDiff(t, od) >= 0 && out.length < 6) out.push([od, o.name]); }
   return out;
 }
-function renderGuide() {
-  const g = GUIDES[S.guide];
-  const done = store.get('chk-' + S.guide, []);
-  const nd = nextDatesFor(S.guide);
-  const mantra = m => m ? `<div class="mantra"><div class="dev">${m.dev}</div><div class="tr">${m.tr}</div><div class="m">${m.mean}</div><button type="button" data-copy="${esc(m.dev)}">Copy mantra</button></div>` : '';
-  setPanel(g.name, `<div class="gdetail">
-    <h2>${g.hi}</h2>
-    <div class="sub">${g.name} <span>· ${g.deity} · ${g.freq}</span></div>
-    <p>${g.about}</p>
-    ${nd.length ? `<div class="gsec"><h4>Next dates in ${esc(S.loc.name)}</h4><div class="nextdates">${nd.map(([o, n]) => `<span class="num" title="${esc(n)}">${WD[new Date(Date.UTC(o.y, o.m, o.d)).getUTCDay()]} ${MON[o.m]} ${o.d}${n && S.guide !== 'ekadashi' && !/Ekadashi|Purnima$|Amavasya$|Pradosh|Chaturthi$|Shivaratri$/.test(n) ? ' · ' + esc(n) : n && /Ekadashi/.test(n) ? ' · ' + esc(n.replace(' Ekadashi', '')) : ''}</span>`).join('')}</div></div>` : ''}
-    <div class="gsec"><h4>Ways to keep it</h4><div class="types">${g.types.map(([a, b]) => `<div><b>${a}</b>${b}</div>`).join('')}</div></div>
-    <div class="gsec"><h4>Puja samagri</h4><ul class="samagri">${g.samagri.map(x => `<li>${x}</li>`).join('')}</ul></div>
-    <div class="gsec"><h4>Vidhi, step by step <span style="text-transform:none;letter-spacing:0;font-weight:400">(tick as you go)</span></h4>
-      <ol class="steps">${g.steps.map(([h, d], i) => `<li class="${done.includes(i) ? 'done' : ''}"><input type="checkbox" id="st-${S.guide}-${i}" data-step-i="${i}"${done.includes(i) ? ' checked' : ''}><label for="st-${S.guide}-${i}"><b>${h}</b><br>${d}</label></li>`).join('')}</ol>
-      ${done.length ? '<button type="button" class="linkbtn" data-reset="1">Clear ticks</button>' : ''}
-    </div>
-    <div class="gsec eatgrid">
-      <div class="card ok"><h3>You can eat</h3><ul>${g.eat.map(x => `<li>${x}</li>`).join('')}</ul></div>
-      <div class="card no"><h3>Avoid</h3><ul>${g.avoid.map(x => `<li>${x}</li>`).join('')}</ul></div>
-    </div>
-    <div class="gsec"><h4>Mantra</h4>${mantra(g.mantra)}${mantra(g.mantra2)}</div>
-    <div class="gsec"><h4>Breaking the fast (parana)</h4><p>${g.parana}</p>${g.note ? `<p class="note">${g.note}</p>` : ''}</div>
-  </div>`);
+function pageMore(v) {
+  const s = S.sel, f = S.f || P.fullDay(s.y, s.m, s.d, S.loc), pk = paksha(f.tithi), obs = obsOn(s), ml = monthLabel(f, f.tithi);
+  const x = dayExtras(s, f, obs);
+  let note = '';
+  if (x.pr) note = `<div class="parana"><b>${x.ekToday ? 'Parana tomorrow' : 'Parana today'}:</b> <span class="num"><b>${fmtT(x.pr.start)} – ${fmtT(x.pr.end)}</b></span></div>`;
+  else if (x.moonFast) note = `<div class="parana" style="border-color:var(--night);background:var(--night-soft)"><b style="color:var(--night)">Moonrise for arghya:</b> <span class="num"><b>${fmtT(f.moonrise)}</b></span></div>`;
+  const body = v.tab === 'm' ? `
+      <dl class="rows num">
+        <dt>Sunrise</dt><dd>${fmtT(f.rise, s)}</dd>
+        <dt>Sunset</dt><dd>${fmtT(f.set, s)}</dd>
+        <dt>Moonrise</dt><dd>${f.moonrise ? fmtT(f.moonrise, s) : 'None this date'}</dd>
+        <dt>Moonset</dt><dd>${f.moonset ? fmtT(f.moonset, s) : 'None this date'}</dd>
+        <dt>Brahma muhurta</dt><dd class="good">${fmtRange(f.brahma, s)}</dd>
+        <dt>Abhijit muhurta</dt><dd class="good">${f.wd === 3 ? '<small>Not used on Wednesday</small>' : fmtRange(f.abhijit, s)}</dd>
+        <dt>Rahu kaal</dt><dd class="bad">${fmtRange(f.rahu, s)}</dd>
+        <dt>Yamaganda</dt><dd class="bad">${fmtRange(f.yama, s)}</dd>
+        <dt>Gulika kaal</dt><dd class="bad">${fmtRange(f.gulika, s)}</dd>
+      </dl>` : `
+      <dl class="rows num">
+        <dt>Tithi</dt><dd>${pk} ${P.tithiName(f.tithi)}<small>till ${fmtT(f.tEnd, s)}, then ${P.tithiName(f.tNext)}</small></dd>
+        <dt>Nakshatra</dt><dd>${P.NAK[f.nak]}<small>till ${fmtT(f.nEnd, s)}, then ${P.NAK[f.nNext]}</small></dd>
+        <dt>Yoga</dt><dd>${P.YOGA[f.yoga]}<small>till ${fmtT(f.yEnd, s)}</small></dd>
+        <dt>Karana</dt><dd>${P.karanaName(f.karana)}<small>till ${fmtT(f.kEnd, s)}</small></dd>
+        <dt>Month</dt><dd>${ml.en} · ${pk} paksha</dd>
+        <dt>Samvat</dt><dd>Vikram ${vikram(f)} · Shaka ${vikram(f) - 135}</dd>
+        <dt>Sun / Moon</dt><dd>${P.RASHI[f.sunRashi]} / ${P.RASHI[f.moonRashi]}</dd>
+      </dl>`;
+  setPanel(`${WD[f.wd]}, ${MON[s.m]} ${s.d}`, `
+    <div class="morehead"><span class="dev">${P.tithiNameHi(f.tithi)}</span><span class="sub">${esc(S.loc.name)}</span></div>
+    ${seg([['p', 'Panchang'], ['m', 'Muhurat & timings']], v.tab, 'data-tabm')}
+    ${note}
+    <div class="card fill">${body}</div>`, 'fit');
 }
 
-/* ---------- one-screen rendering & panels ---------- */
-function setPanel(title, html) { $('#panelTitle').textContent = title; $('#panelBody').innerHTML = html; }
-function drawPanel() { const k = S.panel; if (k === 'fest') renderFest(); else if (k === 'guides') renderGuides(); else if (k === 'guide') renderGuide(); else if (k === 'more') renderMore(); }
-function openPanel(kind) {
-  if (kind === 'guide' && S.panel === 'guides') S.fromGuides = true; else if (kind !== 'guide') S.fromGuides = false;
-  S.panel = kind; drawPanel();
-  const p = $('#panel'); p.hidden = false; p.scrollTop = 0;
-  try { history.replaceState(null, '', '#' + (kind === 'guide' ? 'vrat-' + S.guide : kind)); } catch (e) {}
+function pageFest(v) {
+  const y = v.y, m = v.m, fil = S.festFilter, list = obsYear(y).list;
+  const pass = o => fil === 'all' ? o.kind !== 'solar' || /Makar|Mesha/.test(o.name) : fil === 'major' ? !o.recurring && (o.kind !== 'solar' || /Makar|Mesha/.test(o.name)) : fil === 'vrat' ? o.kind === 'vrat' : fil === 'ekadashi' ? o.recurring === 'ekadashi' : !!o.recurring;
+  const t = todayIn(S.loc.tz);
+  const items = list.filter(o => o.b.m === m && o.b.y === y && pass(o));
+  setPanel('Festivals & vrats', `
+    ${seg(FILTERS, fil, 'data-filter')}
+    <div class="mnav"><button type="button" class="round sm" data-fm="-1" aria-label="Previous month">‹</button><b>${MONTH_FULL[m]} ${y}</b><button type="button" class="round sm" data-fm="1" aria-label="Next month">›</button></div>
+    <ul class="flist2 fill">${items.map(o => {
+      const od = { y: o.b.y, m: o.b.m, d: o.b.d }, dd = dayDiff(t, od);
+      return `<li data-date="${keyOf(od)}"><span class="d num"><b>${od.d}</b><small>${WD[o.b.wd]}</small></span><span class="n"><span class="dot ${o.kind}"></span>${esc(o.name)}<small class="dev">${esc(o.hi)}</small></span><span class="t num">${dd === 0 ? 'Today' : dd > 0 ? dd + 'd' : ''}</span></li>`;
+    }).join('') || '<li class="empty">Nothing in this filter this month.</li>'}</ul>`, 'fit');
+}
+
+function pageGuides(v) {
+  const g = GROUPS.find(x => x[0] === v.g);
+  setPanel('Vrat vidhi', `
+    ${seg(GROUPS.map(([k, l]) => [k, l]), v.g, 'data-grp')}
+    <div class="gtiles fill">${g[2].map(k => { const G = GUIDES[k]; return `<button type="button" class="gtile" data-guide="${k}"><span class="dev">${G.hi}</span><b>${G.name.replace(/ \(.*\)/, '')}</b><small>${G.freq.split(' · ')[0]}</small></button>`; }).join('')}</div>
+    <p class="hint">Every vrat starts with a <b>sankalp</b>: after bathing, hold water in your right palm, say your name and why you are fasting, then let the water fall.</p>`, 'fit');
+}
+
+function pageGuide(v) {
+  const g = GUIDES[v.key], nd = nextDatesFor(v.key), done = store.get('chk-' + v.key, []);
+  setPanel(g.name, `
+    <div class="ghead"><span class="dev">${g.hi}</span><span class="sub">${g.deity} · ${g.freq}</span></div>
+    <p class="about">${g.about}</p>
+    ${nd.length ? `<div class="nextdates">${nd.slice(0, 4).map(([o]) => `<span class="num">${WD[new Date(Date.UTC(o.y, o.m, o.d)).getUTCDay()]} ${MON[o.m]} ${o.d}</span>`).join('')}</div>` : ''}
+    <div class="stiles fill">${SECS.map(([k, l, s]) => `<button type="button" class="stile" data-sec="${k}"><b>${l}</b><small>${k === 'steps' ? `${done.length ? done.length + ' of ' : ''}${g.steps.length} steps` : s}</small></button>`).join('')}</div>`, 'fit');
+}
+
+function pageSec(v) {
+  const g = GUIDES[v.key];
+  const L = SECS.find(x => x[0] === v.sec);
+  const mantra = m => m ? `<div class="mantra"><div class="dev">${m.dev}</div><div class="tr">${m.tr}</div><div class="m">${m.mean}</div><button type="button" data-copy="${esc(m.dev)}">Copy mantra</button></div>` : '';
+  let html = '';
+  if (v.sec === 'samagri') html = `<ul class="blist fill">${g.samagri.map(x => `<li>${x}</li>`).join('')}</ul>`;
+  if (v.sec === 'types') html = `<div class="types fill">${g.types.map(([a, b]) => `<div><b>${a}</b>${b}</div>`).join('')}</div>`;
+  if (v.sec === 'food') html = `<div class="food fill"><div class="card ok"><h3>You can eat</h3><ul>${g.eat.map(x => `<li>${x}</li>`).join('')}</ul></div><div class="card no"><h3>Avoid</h3><ul>${g.avoid.map(x => `<li>${x}</li>`).join('')}</ul></div></div>`;
+  if (v.sec === 'mantra') html = `<div class="fill mantras">${mantra(g.mantra)}${mantra(g.mantra2)}</div>`;
+  if (v.sec === 'parana') html = `<div class="fill"><p class="big">${g.parana}</p>${g.note ? `<p class="note">${g.note}</p>` : ''}</div>`;
+  setPanel(`${g.name.replace(/ \(.*\)/, '')} · ${L[1]}`, `<div class="ghead sm"><span class="dev">${g.hi}</span><span class="sub">${L[2]}</span></div>${html}`, 'fit');
+}
+
+function pageStep(v) {
+  const g = GUIDES[v.key], n = g.steps.length, i = Math.max(0, Math.min(n - 1, v.i)), [h, d] = g.steps[i];
+  const done = store.get('chk-' + v.key, []), isDone = done.includes(i);
+  setPanel(`${g.name.replace(/ \(.*\)/, '')} · Vidhi`, `
+    <div class="ghead sm"><span class="dev">${g.hi}</span><span class="sub">Step ${i + 1} of ${n}</span></div>
+    <div class="pdots">${g.steps.map((_, k) => `<span class="${k === i ? 'cur' : ''} ${done.includes(k) ? 'done' : ''}"></span>`).join('')}</div>
+    <div class="stepcard fill"><span class="sn num">${i + 1}</span><h3>${h}</h3><p>${d}</p>
+      <button type="button" class="donebtn ${isDone ? 'on' : ''}" data-done="${i}">${isDone ? '✓ Done' : 'Mark as done'}</button></div>
+    <div class="pager"><button type="button" class="ghost" data-si="${i - 1}" ${i === 0 ? 'disabled' : ''}>‹ Back</button>
+      ${i < n - 1 ? `<button type="button" class="primary" data-si="${i + 1}">Next step ›</button>` : `<button type="button" class="primary" data-closepanel="1">Finish</button>`}</div>
+    ${done.length ? '<button type="button" class="linkbtn center" data-reset="1">Clear all ticks</button>' : ''}`, 'fit');
+}
+
+function drawPanel() {
+  const v = top_(); if (!v) return;
+  ({ more: pageMore, fest: pageFest, guides: pageGuides, guide: pageGuide, sec: pageSec, step: pageStep })[v.k](v);
+}
+function push(v) { S.stack.push(v); S.panel = true; drawPanel(); $('#panel').hidden = false; }
+function openRoot(k) {
+  S.stack = [];
+  if (k === 'more') push({ k: 'more', tab: 'p' });
+  else if (k === 'fest') push({ k: 'fest', y: S.sel.y, m: S.sel.m });
+  else push({ k: 'guides', g: 'monthly' });
 }
 function closePanel() {
-  if (S.panel === 'guide' && S.fromGuides) { S.fromGuides = false; return openPanel('guides'); }
-  S.panel = null; $('#panel').hidden = true;
-  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  S.stack.pop();
+  if (S.stack.length) return drawPanel();
+  S.panel = false; $('#panel').hidden = true;
 }
+function closeAll() { S.stack = []; S.panel = false; $('#panel').hidden = true; }
 function render() {
   try { renderDay(); renderMonth(); if (S.panel) drawPanel(); }
   catch (err) { console.error(err); $('#v-day').innerHTML = `<p class="loading">Could not calculate for this place and date. Check the latitude, longitude and time zone.</p>`; }
 }
-function openGuide(k) { S.guide = k; openPanel('guide'); }
+function openGuide(k) { S.guide = k; push({ k: 'guide', key: k }); }
 function pickDate(k) { const [y, m, d] = k.split('-').map(Number); S.sel = { y, m, d }; S.cal = { y, m }; render(); }
-function goDate(k) { pickDate(k); if (S.panel) { S.fromGuides = false; closePanel(); } }
+function goDate(k) { closeAll(); pickDate(k); }
 
 document.addEventListener('click', e => {
   if (e.target.id === 'scrim') return openSheet(false);
-  const t = e.target.closest('button, li[data-date]'); if (!t) return;
-  if (t.dataset.sheet) return openSheet(true);
-  if (t.dataset.close) return openSheet(false);
-  if (t.dataset.closepanel) return closePanel();
-  if (t.dataset.panel) return openPanel(t.dataset.panel);
-  if (t.dataset.guide) return openGuide(t.dataset.guide);
-  if (t.dataset.pick) return pickDate(t.dataset.pick);
-  if (t.dataset.step) { S.sel = addDays(S.sel, +t.dataset.step); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
-  if (t.dataset.today) { S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
-  if (t.dataset.mstep) { const d = new Date(Date.UTC(S.cal.y, S.cal.m + +t.dataset.mstep, 1)); S.cal = { y: d.getUTCFullYear(), m: d.getUTCMonth() }; return renderMonth(); }
-  if (t.dataset.filter) { S.festFilter = t.dataset.filter; return renderFest(); }
-  if (t.dataset.date) return goDate(t.dataset.date);
-  if (t.dataset.reset) { store.set('chk-' + S.guide, []); return renderGuide(); }
-  if (t.dataset.copy) {
-    const txt = t.dataset.copy;
+  const t = e.target.closest('button, li[data-date]'); if (!t || t.disabled) return;
+  const v = top_(), ds = t.dataset;
+  if (ds.sheet) return openSheet(true);
+  if (ds.close) return openSheet(false);
+  if (ds.closepanel) return closePanel();
+  if (ds.panel) return openRoot(ds.panel);
+  if (ds.guide) return openGuide(ds.guide);
+  if (ds.sec) return push(ds.sec === 'steps' ? { k: 'step', key: v.key, i: 0 } : { k: 'sec', key: v.key, sec: ds.sec });
+  if (ds.si != null) { v.i = +ds.si; return drawPanel(); }
+  if (ds.done != null) { const i = +ds.done; let d = store.get('chk-' + v.key, []); d = d.includes(i) ? d.filter(x => x !== i) : [...d, i]; store.set('chk-' + v.key, d); if (!d.includes(i)) return drawPanel(); if (i < GUIDES[v.key].steps.length - 1) v.i = i + 1; return drawPanel(); }
+  if (ds.tabm) { v.tab = ds.tabm; return drawPanel(); }
+  if (ds.grp) { v.g = ds.grp; return drawPanel(); }
+  if (ds.fm) { const d = new Date(Date.UTC(v.y, v.m + +ds.fm, 1)); v.y = d.getUTCFullYear(); v.m = d.getUTCMonth(); return drawPanel(); }
+  if (ds.filter) { S.festFilter = ds.filter; return drawPanel(); }
+  if (ds.pick) return pickDate(ds.pick);
+  if (ds.step) { S.sel = addDays(S.sel, +ds.step); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
+  if (ds.today) { S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
+  if (ds.mstep) { const d = new Date(Date.UTC(S.cal.y, S.cal.m + +ds.mstep, 1)); S.cal = { y: d.getUTCFullYear(), m: d.getUTCMonth() }; return renderMonth(); }
+  if (ds.date) return goDate(ds.date);
+  if (ds.reset) { store.set('chk-' + v.key, []); if (v.k === 'step') v.i = 0; return drawPanel(); }
+  if (ds.copy) {
     const ok = () => { t.textContent = 'Copied'; setTimeout(() => (t.textContent = 'Copy mantra'), 1500); };
-    try { navigator.clipboard.writeText(txt).then(ok, () => selectText(t.parentElement.querySelector('.dev'))); } catch (err) { selectText(t.parentElement.querySelector('.dev')); }
+    try { navigator.clipboard.writeText(ds.copy).then(ok, () => selectText(t.parentElement.querySelector('.dev'))); } catch (err) { selectText(t.parentElement.querySelector('.dev')); }
   }
 });
 function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.id === 'pick' && t.value) { const [y, m, d] = t.value.split('-').map(Number); S.sel = { y, m: m - 1, d }; S.cal = { y, m: m - 1 }; render(); }
-  if (t.id === 'fyear') { S.festYear = +t.value; renderFest(); }
-  if (t.dataset.stepI != null) {
-    const i = +t.dataset.stepI; let done = store.get('chk-' + S.guide, []);
-    done = t.checked ? [...new Set([...done, i])] : done.filter(x => x !== i);
-    store.set('chk-' + S.guide, done); t.closest('li').classList.toggle('done', t.checked);
-  }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.panel && $('#sheet').hidden) closePanel(); });
 // swipe left/right on the day card to change day
@@ -1519,8 +1611,8 @@ if ('serviceWorker' in navigator && /vercel\.app$|^localhost$/.test(location.hos
   S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; S.festYear = S.sel.y;
   render();
   const h = (location.hash || '').slice(1);
-  if (h.startsWith('vrat-') && GUIDES[h.slice(5)]) openGuide(h.slice(5));
-  else if (['fest', 'guides', 'more'].includes(h)) openPanel(h);
+  if (h.startsWith('vrat-') && GUIDES[h.slice(5)]) { openRoot('guides'); openGuide(h.slice(5)); }
+  else if (['fest', 'guides', 'more'].includes(h)) openRoot(h);
 })();
 
 </script>
