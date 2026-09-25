@@ -1,0 +1,29 @@
+{
+  "name": "Tithi \u2013 Hindu Calendar & Vrat",
+  "short_name": "Tithi",
+  "description": "Daily panchang, vrat and festival dates, and fasting guides.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4EEE4",
+  "theme_color": "#B8142D",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

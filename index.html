@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Tithi: Hindu calendar with daily panchang, vrat and festival dates, and step-by-step fasting guides.">
+<meta name="theme-color" content="#B8142D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Tithi">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <title>Tithi</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -191,41 +199,176 @@ ol.steps li.done label{color:var(--muted)}
 .muted{color:var(--muted);font-weight:400}
 .loading{color:var(--muted);font-size:14px;padding:12px 0}
 @media (prefers-reduced-motion:no-preference){.view{animation:fade .25s ease}@keyframes fade{from{opacity:.4}to{opacity:1}}}
+
+/* ===== App shell ===== */
+body{padding:0;margin:0;background:var(--backdrop)}
+:root{--backdrop:#E6DCCD;--tabh:64px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--backdrop:#0D0908}}
+:root[data-theme="dark"]{--backdrop:#0D0908}
+.app{max-width:520px;margin:0 auto;min-height:100vh;background:var(--ground);position:relative}
+@media (min-width:560px){.app{box-shadow:0 0 0 1px var(--line),0 20px 60px -30px rgba(0,0,0,.35)}}
+.appbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--ground);border-bottom:1px solid var(--line)}
+.apptitle{flex:1;display:flex;align-items:center;gap:10px;min-width:0}
+.apptitle .dev{font-size:28px;color:var(--kumkum);line-height:1;padding-top:4px}
+.locchip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 10px 4px 8px;font-size:13px;font-weight:600;cursor:pointer;min-width:0;max-width:100%}
+.locchip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.locchip svg{width:14px;height:14px;flex:none}
+.iconbtn{width:40px;height:40px;border-radius:50%;border:0;background:transparent;display:grid;place-items:center;cursor:pointer;flex:none}
+.iconbtn:active{background:var(--sunk)}
+svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn svg{width:22px;height:22px}
+.content{padding:14px 16px calc(var(--tabh) + 28px + env(safe-area-inset-bottom,0px))}
+section.view{padding-top:0}
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:20;display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;color:var(--muted);font-size:11.5px;font-weight:600;cursor:pointer;border-radius:12px}
+.tabbar svg{width:24px;height:24px;padding:2px 14px;box-sizing:content-box;border-radius:999px}
+.tabbar button[aria-selected="true"]{color:var(--kumkum)}
+.tabbar button[aria-selected="true"] svg{background:var(--kumkum-soft)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30}
+.sheet{position:fixed;left:50%;transform:translateX(-50%);bottom:0;width:100%;max-width:520px;z-index:31;background:var(--surface);border-radius:20px 20px 0 0;padding:8px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.sheet .grab{width:40px;height:4px;border-radius:4px;background:var(--line);margin:4px auto 0}
+.sheet h2{margin:0;font-size:20px}
+.field{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);font-weight:600}
+.field select{font-size:16px;color:var(--ink);font-weight:500;border:1px solid var(--line);background:var(--ground);border-radius:12px;padding:10px 12px}
+.sheet .custom{margin:0}
+.primary{border:0;background:var(--kumkum);color:#fff;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer}
+.primary.wide{width:100%;padding:13px}
+.sheet .foot{margin:0}
+@media (prefers-reduced-motion:no-preference){.sheet:not([hidden]){animation:up .22s ease}@keyframes up{from{transform:translate(-50%,40px);opacity:.6}to{transform:translate(-50%,0);opacity:1}}}
+
+/* compact components inside the app column */
+.daynav{display:grid;grid-template-columns:auto 1fr auto;gap:8px;margin-bottom:12px}
+.daynav button{padding:8px 14px}
+.daynav input{text-align:center;padding:8px 10px;min-width:0;width:100%}
+.daynav [data-today]{grid-column:1/-1}
+.hero{grid-template-columns:1fr auto;padding:20px 16px 16px;gap:10px}
+.hero .tithi-hi{font-size:clamp(40px,12vw,54px)}
+.hero .tithi-en{font-size:16px}
+.hero .meta{font-size:13px;gap:4px 14px}
+.moonbox{display:block;text-align:center;align-self:start}
+.moonbox svg{width:72px;margin:0 auto 4px}
+.hero > div:first-child{min-width:0}
+.hero .chips,.hero .parana{grid-column:1/-1}
+.grid2{grid-template-columns:1fr;gap:12px;margin-top:12px}
+.card{border-radius:16px}
+.calhead{display:grid;grid-template-columns:1fr auto auto auto;gap:6px;align-items:center}
+.calhead h2{font-size:24px;margin:0}
+.calhead button{padding:6px 12px}
+.cell{min-height:58px;padding:5px;border-radius:10px}
+.cell .ev{display:none}
+.cell .dots{display:flex}
+.cell .ti{font-size:10px}
+.cell .tn{display:none}
+.cell .dn{font-size:15px}
+.daysum{margin-top:14px}
+.daysum .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.daysum .dev{font-size:26px}
+.daysum .sub{color:var(--muted);font-size:13px}
+.daysum .open{margin-top:12px;width:100%}
+.filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}
+.filters button{white-space:nowrap}
+.filters select{margin-left:6px}
+.flist li{grid-template-columns:70px 1fr}
+.flist .t{grid-column:2;text-align:left}
+.gcards{grid-template-columns:1fr;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.gcard{border:0;border-radius:0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 16px}
+.gcard:last-child{border-bottom:0}
+.gcard::after{content:"›";font-size:24px;color:var(--muted);grid-column:2;grid-row:1/5}
+.gcard > *{grid-column:1}
+.gdetail .back{display:none}
+.types,.eatgrid{grid-template-columns:1fr}
+.samagri{columns:1}
+.upcoming li{grid-template-columns:58px 1fr auto}
+@media (prefers-reduced-motion:no-preference){.view{animation:fade .2s ease}}
+
+/* ===== One-page layout ===== */
+.content{padding:12px 16px calc(40px + env(safe-area-inset-bottom,0px))}
+body.locked{overflow:hidden}
+.blk{margin-top:30px}
+.blkhead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.blkhead h2{margin:0;font-size:17px;font-weight:700}
+.blkhead h2 .dev{color:var(--kumkum);font-size:22px;font-weight:400;margin-right:4px}
+.linkbtn{border:0;background:none;color:var(--kumkum);font-weight:600;cursor:pointer;padding:4px 0;font-size:14px}
+.daynav{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.daynav .round{width:40px;height:40px;border-radius:50%;padding:0;font-size:22px;line-height:1;display:grid;place-items:center;flex:none}
+.datepill{flex:1;position:relative;display:flex;align-items:center;justify-content:center;height:40px;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-weight:700;cursor:pointer;overflow:hidden}
+.datepill input{position:absolute;inset:0;opacity:0;width:100%;height:100%;border:0;cursor:pointer}
+.todaybtn{width:100%;border:0!important;background:var(--kumkum-soft)!important;color:var(--kumkum);font-weight:600;border-radius:999px;padding:6px!important}
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.strip div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 6px;text-align:center;min-width:0}
+.strip small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.strip b{font-size:13.5px;white-space:nowrap}
+.strip .bad b{color:var(--kumkum)}
+details.more{margin-top:10px}
+details.more summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-weight:600}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary::after{content:"⌄";font-size:18px;color:var(--muted);transition:transform .2s}
+details.more[open] summary::after{transform:rotate(180deg)}
+.upscroll{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin-inline:-16px;padding:2px 16px 6px;scrollbar-width:none}
+.upscroll::-webkit-scrollbar{display:none}
+.upcard{flex:0 0 148px;scroll-snap-align:start;text-align:left;display:flex;flex-direction:column;gap:2px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--muted);border-radius:14px;padding:10px 12px;cursor:pointer}
+.upcard.vrat{border-top-color:var(--peacock)} .upcard.festival{border-top-color:var(--kumkum)} .upcard.observance{border-top-color:var(--night)} .upcard.solar{border-top-color:var(--haldi)}
+.uwhen{font-size:12px;color:var(--muted);font-weight:600}
+.uname{font-weight:700;line-height:1.25;font-size:14.5px}
+.uhi{font-size:15px;color:var(--muted)}
+.uin{margin-top:auto;font-size:12px;font-weight:600;color:var(--kumkum)}
+.calhead h2{font-size:22px}
+.panel{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;z-index:40;background:var(--ground);overflow-y:auto;overscroll-behavior:contain}
+.panelbar{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:6px;padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px;background:var(--ground);border-bottom:1px solid var(--line);font-weight:700;font-size:17px}
+.panelbody{padding:16px 16px calc(40px + env(safe-area-inset-bottom,0px))}
+@media (prefers-reduced-motion:no-preference){.panel:not([hidden]){animation:slidein .22s ease}@keyframes slidein{from{transform:translate(-45%,0);opacity:.5}to{transform:translate(-50%,0);opacity:1}}}
+.gdetail h2{font-size:clamp(34px,10vw,44px)}
 </style>
 </head>
 <body>
 
 
-<div class="wrap">
-  <header class="top">
-    <div class="brand"><span class="dev">तिथि</span><b>Tithi · Hindu Calendar &amp; Vrat</b></div>
-    <div class="ctrls">
-      <select id="loc" aria-label="Location"></select>
-      <select id="trad" aria-label="Month system">
-        <option value="p">North · Purnimanta</option>
-        <option value="a">South · Amanta</option>
-      </select>
-    </div>
+<div class="app">
+  <header class="appbar">
+    <button type="button" class="iconbtn" id="backBtn" data-back="1" aria-label="Back" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="apptitle"><span class="dev">तिथि</span><button type="button" id="locChip" class="locchip" data-sheet="1"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span id="locLabel"></span></button></div>
+    <button type="button" class="iconbtn" data-sheet="1" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
   </header>
-  <div id="customBox" class="custom" hidden>
-    <label>Latitude<input id="cLat" type="number" step="0.0001" value="34.7465"></label>
-    <label>Longitude<input id="cLon" type="number" step="0.0001" value="-92.2896"></label>
-    <label>Time zone<select id="cTz"></select></label>
-    <button class="pill" id="cApply" type="button" style="border:1px solid var(--line);background:var(--ink);color:var(--ground);border-radius:999px;padding:6px 14px">Use this place</button>
+
+  <main class="content">
+    <section id="v-day"></section>
+    <section class="blk">
+      <div class="blkhead"><h2><span class="dev">आगामी</span> Coming up</h2><button type="button" class="linkbtn" data-allfest="1">All festivals ›</button></div>
+      <div id="v-up"></div>
+    </section>
+    <section class="blk" id="v-month"></section>
+    <section class="blk">
+      <div class="blkhead"><h2><span class="dev">व्रत विधि</span> Fasting guides</h2></div>
+      <div id="v-vrat"></div>
+    </section>
+  </main>
+
+  <div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle" hidden>
+    <header class="panelbar">
+      <button type="button" class="iconbtn" data-closepanel="1" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div id="panelTitle"></div>
+    </header>
+    <div class="panelbody" id="panelBody"></div>
   </div>
-  <nav class="tabs" role="tablist">
-    <button role="tab" data-tab="day" aria-selected="true"><span class="hi">आज</span>Day</button>
-    <button role="tab" data-tab="month"><span class="hi">मास</span>Calendar</button>
-    <button role="tab" data-tab="fest"><span class="hi">उत्सव</span>Festivals</button>
-    <button role="tab" data-tab="vrat"><span class="hi">विधि</span>Vrat guides</button>
-  </nav>
 
-  <section class="view" id="v-day"></section>
-  <section class="view" id="v-month" hidden></section>
-  <section class="view" id="v-fest" hidden></section>
-  <section class="view" id="v-vrat" hidden></section>
-
-  <p class="foot">Times are calculated in your browser from sun and moon positions (Meeus algorithms, Lahiri ayanamsa) for the chosen place. Festival dates follow standard Smarta rules; your temple or family panchang may differ by a day, especially near tithi boundaries. If you have a health condition, are pregnant or take regular medication, talk to your doctor before a nirjala fast and choose phalahar instead.</p>
+  <div class="scrim" id="scrim" data-close="1" hidden></div>
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Settings" hidden>
+    <div class="grab"></div>
+    <h2>Settings</h2>
+    <label class="field">Location<select id="loc"></select></label>
+    <div id="customBox" class="custom" hidden>
+      <label>Latitude<input id="cLat" type="number" step="0.0001" value="34.7465"></label>
+      <label>Longitude<input id="cLon" type="number" step="0.0001" value="-92.2896"></label>
+      <label>Time zone<select id="cTz"></select></label>
+      <button class="primary" id="cApply" type="button">Use this place</button>
+    </div>
+    <label class="field">Month system<select id="trad">
+      <option value="p">North India · Purnimanta</option>
+      <option value="a">South & West · Amanta</option>
+    </select></label>
+    <p class="foot">Times are calculated on your device from sun and moon positions (Meeus algorithms, Lahiri ayanamsa) for the chosen place. Festival dates follow standard Smarta rules; your temple or family panchang may differ by a day near tithi boundaries. If you have a health condition, are pregnant or take regular medication, talk to your doctor before a nirjala fast and choose phalahar instead.</p>
+    <button type="button" class="primary wide" data-close="1">Done</button>
+  </div>
 </div>
 
 <script>
@@ -1043,18 +1186,18 @@ function renderDay() {
   // upcoming
   const ups = [];
   for (const y of [s.y, s.y + 1]) { for (const o of obsYear(y).list) { const od = { y: o.b.y, m: o.b.m, d: o.b.d }; const dd = dayDiff(s, od); if (dd > 0 && o.kind !== 'solar') ups.push([dd, od, o]); } if (ups.length >= 10) break; }
-  const upHTML = ups.slice(0, 10).map(([dd, od, o]) => `<li data-date="${keyOf(od)}"><span class="when num">${MON[od.m]} ${od.d}<small>${WD[new Date(Date.UTC(od.y, od.m, od.d)).getUTCDay()]}</small></span><span><span class="dot ${o.kind}"></span>${esc(o.name)}</span><span class="in num">in ${dd} day${dd > 1 ? 's' : ''}</span></li>`).join('');
+  const _unused = ups.slice(0, 0).map(([dd, od, o]) => `<li data-date="${keyOf(od)}"><span class="when num">${MON[od.m]} ${od.d}<small>${WD[new Date(Date.UTC(od.y, od.m, od.d)).getUTCDay()]}</small></span><span><span class="dot ${o.kind}"></span>${esc(o.name)}</span><span class="in num">in ${dd} day${dd > 1 ? 's' : ''}</span></li>`).join('');
 
   $('#v-day').innerHTML = `
   <div class="daynav">
-    <button type="button" data-step="-1" aria-label="Previous day">← Prev</button>
-    <input type="date" id="pick" value="${s.y}-${String(s.m + 1).padStart(2, '0')}-${String(s.d).padStart(2, '0')}" aria-label="Pick a date">
-    <button type="button" data-step="1" aria-label="Next day">Next →</button>
-    ${isToday ? '' : '<button type="button" data-today="1">Today</button>'}
+    <button type="button" class="round" data-step="-1" aria-label="Previous day">‹</button>
+    <label class="datepill"><span>${isToday ? 'Today' : WD[f.wd] + ', ' + MON[s.m] + ' ' + s.d}</span><input type="date" id="pick" value="${s.y}-${String(s.m + 1).padStart(2, '0')}-${String(s.d).padStart(2, '0')}" aria-label="Pick a date"></label>
+    <button type="button" class="round" data-step="1" aria-label="Next day">›</button>
+    ${isToday ? '' : '<button type="button" class="todaybtn" data-today="1">Back to today</button>'}
   </div>
   <div class="hero">
     <div>
-      <div class="greg">${WD_FULL[f.wd]} · ${MONTH_FULL[s.m]} ${s.d}, ${s.y} · ${esc(L.name)}</div>
+      <div class="greg">${WD_FULL[f.wd]} · ${MON[s.m]} ${s.d}, ${s.y}</div>
       <div class="tithi-hi">${P.tithiNameHi(f.tithi)}</div>
       <div class="tithi-en">${pk === 'Shukla' ? 'Shukla' : 'Krishna'} ${P.tithiName(f.tithi)} <span>till ${fmtT(f.tEnd, s)}, then ${P.tithiName(f.tNext)}</span></div>
       <div class="meta">
@@ -1068,7 +1211,13 @@ function renderDay() {
     </div>
     <div class="moonbox">${moonSVG(f.elong)}<div><b class="num">${illum}%</b> lit<br>${f.elong < 180 ? 'Waxing' : 'Waning'}</div></div>
   </div>
-  <div class="grid2">
+  <div class="strip num">
+    <div><small>Sunrise</small><b>${fmtT(f.rise)}</b></div>
+    <div><small>Sunset</small><b>${fmtT(f.set)}</b></div>
+    <div><small>Moonrise</small><b>${f.moonrise ? fmtT(f.moonrise) : '—'}</b></div>
+    <div class="bad"><small>Rahu kaal</small><b>${fmtT(f.rahu[0])}</b></div>
+  </div>
+  <details class="more" id="moreBox"${S.more ? ' open' : ''}><summary>Full panchang &amp; muhurat</summary><div class="grid2">
     <div class="card"><h3>Panchang at sunrise</h3>
       <dl class="rows num">
         <dt>Tithi</dt><dd>${pk} ${P.tithiName(f.tithi)}<small>${fmtT(f.tStart, s)} → ${fmtT(f.tEnd, s)}</small></dd>
@@ -1093,8 +1242,16 @@ function renderDay() {
         <dt>Gulika kaal</dt><dd class="bad">${fmtRange(f.gulika, s)}</dd>
       </dl>
     </div>
-    <div class="card"><h3>Coming up</h3><ul class="upcoming">${upHTML}</ul></div>
-  </div>`;
+  </div></details>`;
+  renderUp(ups);
+}
+
+function renderUp(ups) {
+  $('#v-up').innerHTML = `<div class="upscroll">${ups.slice(0, 12).map(([dd, od, o]) => `<button type="button" class="upcard ${o.kind}" data-date="${keyOf(od)}">
+    <span class="uwhen num">${WD[new Date(Date.UTC(od.y, od.m, od.d)).getUTCDay()]}, ${MON[od.m]} ${od.d}</span>
+    <span class="uname">${esc(o.name)}</span>
+    <span class="uhi dev">${esc(o.hi)}</span>
+    <span class="uin num">${dd === 1 ? 'Tomorrow' : 'in ' + dd + ' days'}</span></button>`).join('')}</div>`;
 }
 
 /* ---------- Month view ---------- */
@@ -1123,11 +1280,23 @@ function renderMonth() {
   <div class="calhead">
     <h2>${MONTH_FULL[m]} ${y}<small>${l1.en}${l1.en !== l2.en ? ' – ' + l2.en : ''} · Vikram Samvat ${vikram(bn)} · ${esc(L.name)}</small></h2>
     <button type="button" data-mstep="-1" aria-label="Previous month">←</button>
-    <button type="button" data-mthis="1">This month</button>
+    <button type="button" data-mthis="1">Now</button>
     <button type="button" data-mstep="1" aria-label="Next month">→</button>
   </div>
   <div class="cal">${cells}</div>
   <div class="legend"><span><span class="dot vrat"></span>Vrat / fast</span><span><span class="dot festival"></span>Festival</span><span><span class="dot observance"></span>Amavasya / Pitru</span><span><span class="dot solar"></span>Sankranti</span><span>S = Shukla, K = Krishna paksha (tithi at sunrise)</span></div>`;
+}
+
+function daySummary() {
+  const s = S.sel; if (s.y !== S.cal.y || s.m !== S.cal.m) return '';
+  const b = P.basicDay(s.y, s.m, s.d, S.loc), ti = b.ti.sunrise, ml = monthLabel(b, ti), ev = obsOn(s);
+  return `<div class="card daysum">
+    <div class="row"><span class="dev">${P.tithiNameHi(ti)}</span><span class="sub num">${WD[b.wd]}, ${MON[s.m]} ${s.d}</span></div>
+    <div><b>${paksha(ti)} ${P.tithiName(ti)}</b> <span class="sub">· ${ml.en}</span></div>
+    <div class="sub num">Sunrise ${fmtT(b.rise)} · Sunset ${fmtT(b.set)}</div>
+    ${ev.length ? `<div class="chips">${ev.map(chip).join('')}</div>` : ''}
+    <button type="button" class="primary open" data-openday="1">Full panchang for this day</button>
+  </div>`;
 }
 
 /* ---------- Festivals view ---------- */
@@ -1147,10 +1316,10 @@ function renderFest() {
       return `<li data-date="${keyOf(od)}"><span class="d num">${MON[m]} ${od.d}<small>${WD[o.b.wd]}</small></span><span class="n"><span class="dot ${o.kind}"></span>${esc(o.name)}<small>${esc(o.hi)}</small></span><span class="t">${dd === 0 ? 'Today' : dd > 0 ? `in ${dd} days` : ml.en}</span></li>`;
     }).join('')}</ul></div>`;
   }
-  $('#v-fest').innerHTML = `
+  setPanel('Festivals & vrats', `
   <div class="filters">${FILTERS.map(([k, l]) => `<button type="button" data-filter="${k}" aria-pressed="${k === fil}">${l}</button>`).join('')}
     <select id="fyear" aria-label="Year">${[y - 1, y, y + 1, y + 2].map(v => `<option${v === y ? ' selected' : ''}>${v}</option>`).join('')}</select></div>
-  ${html || '<p class="loading">Nothing in this filter for the year.</p>'}`;
+  ${html || '<p class="loading">Nothing in this filter for the year.</p>'}`);
 }
 
 /* ---------- Vrat guides ---------- */
@@ -1162,18 +1331,18 @@ function nextDatesFor(key) {
   return out;
 }
 function renderVrat() {
-  const g = S.guide && GUIDES[S.guide];
-  if (!g) {
+  {
     $('#v-vrat').innerHTML = `
     <div class="note">Every vrat starts with a <b>sankalp</b>: after bathing, hold water in your right palm, say your name, the day and why you are keeping the fast, then let the water fall. Keep what you promise. A lighter fast done with devotion is better than a strict one you cannot finish.</div>
     <div class="gcards">${Object.entries(GUIDES).map(([k, v]) => `<button type="button" class="gcard" data-guide="${k}"><span class="dev">${v.hi}</span><b>${v.name}</b><small>${v.deity}</small><small>${v.freq}</small></button>`).join('')}</div>`;
-    return;
   }
+}
+function renderGuide() {
+  const g = GUIDES[S.guide];
   const done = store.get('chk-' + S.guide, []);
   const nd = nextDatesFor(S.guide);
   const mantra = m => m ? `<div class="mantra"><div class="dev">${m.dev}</div><div class="tr">${m.tr}</div><div class="m">${m.mean}</div><button type="button" data-copy="${esc(m.dev)}">Copy mantra</button></div>` : '';
-  $('#v-vrat').innerHTML = `<div class="gdetail">
-    <button type="button" class="back" data-back="1">← All vrat guides</button>
+  setPanel(g.name, `<div class="gdetail">
     <h2>${g.hi}</h2>
     <div class="sub">${g.name} <span>· ${g.deity} · ${g.freq}</span></div>
     <p>${g.about}</p>
@@ -1182,7 +1351,7 @@ function renderVrat() {
     <div class="gsec"><h4>Puja samagri</h4><ul class="samagri">${g.samagri.map(x => `<li>${x}</li>`).join('')}</ul></div>
     <div class="gsec"><h4>Vidhi, step by step <span style="text-transform:none;letter-spacing:0;font-weight:400">(tick as you go)</span></h4>
       <ol class="steps">${g.steps.map(([h, d], i) => `<li class="${done.includes(i) ? 'done' : ''}"><input type="checkbox" id="st-${S.guide}-${i}" data-step-i="${i}"${done.includes(i) ? ' checked' : ''}><label for="st-${S.guide}-${i}"><b>${h}</b><br>${d}</label></li>`).join('')}</ol>
-      ${done.length ? '<button type="button" class="back" data-reset="1" style="margin-top:8px">Clear ticks</button>' : ''}
+      ${done.length ? '<button type="button" class="linkbtn" data-reset="1">Clear ticks</button>' : ''}
     </div>
     <div class="gsec eatgrid">
       <div class="card ok"><h3>You can eat</h3><ul>${g.eat.map(x => `<li>${x}</li>`).join('')}</ul></div>
@@ -1190,54 +1359,67 @@ function renderVrat() {
     </div>
     <div class="gsec"><h4>Mantra</h4>${mantra(g.mantra)}${mantra(g.mantra2)}</div>
     <div class="gsec"><h4>Breaking the fast (parana)</h4><p>${g.parana}</p>${g.note ? `<p class="note">${g.note}</p>` : ''}</div>
-  </div>`;
+  </div>`);
 }
 
-/* ---------- routing & events ---------- */
-function show(tab, push = true) {
-  S.tab = tab;
-  document.querySelectorAll('nav.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === tab));
-  for (const v of ['day', 'month', 'fest', 'vrat']) $('#v-' + v).hidden = v !== tab;
-  render();
-  if (push) { try { history.replaceState(null, '', '#' + (tab === 'vrat' && S.guide ? 'vrat-' + S.guide : tab)); } catch (e) {} }
+/* ---------- one-page rendering & panel ---------- */
+function setPanel(title, html) { $('#panelTitle').textContent = title; $('#panelBody').innerHTML = html; }
+function openPanel(kind) {
+  S.panel = kind;
+  if (kind === 'fest') renderFest(); else renderGuide();
+  const p = $('#panel'); const wasOpen = !p.hidden; p.hidden = false; if (!wasOpen) p.scrollTop = 0;
+  document.body.classList.add('locked');
+  try { history.replaceState(null, '', '#' + (kind === 'fest' ? 'fest' : 'vrat-' + S.guide)); } catch (e) {}
+}
+function closePanel() {
+  S.panel = null; $('#panel').hidden = true; document.body.classList.remove('locked');
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
 }
 function render() {
-  try {
-    if (S.tab === 'day') renderDay(); else if (S.tab === 'month') renderMonth(); else if (S.tab === 'fest') renderFest(); else renderVrat();
-  } catch (err) { console.error(err); $('#v-' + S.tab).innerHTML = `<p class="loading">Could not calculate for this place and date. Check the latitude, longitude and time zone.</p>`; }
+  try { renderDay(); renderMonth(); renderVrat(); if (S.panel) (S.panel === 'fest' ? renderFest() : renderGuide()); }
+  catch (err) { console.error(err); $('#v-day').innerHTML = `<p class="loading">Could not calculate for this place and date. Check the latitude, longitude and time zone.</p>`; }
 }
-function openGuide(k) { S.guide = k; show('vrat'); window.scrollTo(0, 0); }
-function goDate(k) { const [y, m, d] = k.split('-').map(Number); S.sel = { y, m, d }; S.cal = { y, m }; show('day'); window.scrollTo(0, 0); }
+function openGuide(k) { S.guide = k; openPanel('guide'); }
+function goDate(k) { const [y, m, d] = k.split('-').map(Number); S.sel = { y, m, d }; S.cal = { y, m }; if (S.panel) closePanel(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
 
 document.addEventListener('click', e => {
+  if (e.target.id === 'scrim') return openSheet(false);
   const t = e.target.closest('button, li[data-date]'); if (!t) return;
-  if (t.dataset.tab) return show(t.dataset.tab);
+  if (t.dataset.sheet) return openSheet(true);
+  if (t.dataset.close) return openSheet(false);
+  if (t.dataset.closepanel) return closePanel();
+  if (t.dataset.allfest) return openPanel('fest');
   if (t.dataset.guide) return openGuide(t.dataset.guide);
-  if (t.dataset.back) { S.guide = null; return show('vrat'); }
   if (t.dataset.step) { S.sel = addDays(S.sel, +t.dataset.step); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
   if (t.dataset.today) { S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
-  if (t.dataset.mstep) { const d = new Date(Date.UTC(S.cal.y, S.cal.m + +t.dataset.mstep, 1)); S.cal = { y: d.getUTCFullYear(), m: d.getUTCMonth() }; return render(); }
-  if (t.dataset.mthis) { const n = todayIn(S.loc.tz); S.cal = { y: n.y, m: n.m }; return render(); }
-  if (t.dataset.filter) { S.festFilter = t.dataset.filter; return render(); }
+  if (t.dataset.mstep) { const d = new Date(Date.UTC(S.cal.y, S.cal.m + +t.dataset.mstep, 1)); S.cal = { y: d.getUTCFullYear(), m: d.getUTCMonth() }; return renderMonth(); }
+  if (t.dataset.mthis) { const n = todayIn(S.loc.tz); S.cal = { y: n.y, m: n.m }; return renderMonth(); }
+  if (t.dataset.filter) { S.festFilter = t.dataset.filter; return renderFest(); }
   if (t.dataset.date) return goDate(t.dataset.date);
-  if (t.dataset.reset) { store.set('chk-' + S.guide, []); return render(); }
+  if (t.dataset.reset) { store.set('chk-' + S.guide, []); return renderGuide(); }
   if (t.dataset.copy) {
     const txt = t.dataset.copy;
     const ok = () => { t.textContent = 'Copied'; setTimeout(() => (t.textContent = 'Copy mantra'), 1500); };
     try { navigator.clipboard.writeText(txt).then(ok, () => selectText(t.parentElement.querySelector('.dev'))); } catch (err) { selectText(t.parentElement.querySelector('.dev')); }
   }
 });
+document.addEventListener('toggle', e => { if (e.target.id === 'moreBox') S.more = e.target.open; }, true);
 function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.id === 'pick' && t.value) { const [y, m, d] = t.value.split('-').map(Number); S.sel = { y, m: m - 1, d }; S.cal = { y, m: m - 1 }; render(); }
-  if (t.id === 'fyear') { S.festYear = +t.value; render(); }
+  if (t.id === 'fyear') { S.festYear = +t.value; renderFest(); }
   if (t.dataset.stepI != null) {
     const i = +t.dataset.stepI; let done = store.get('chk-' + S.guide, []);
     done = t.checked ? [...new Set([...done, i])] : done.filter(x => x !== i);
     store.set('chk-' + S.guide, done); t.closest('li').classList.toggle('done', t.checked);
   }
 });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.panel && $('#sheet').hidden) closePanel(); });
+
+/* settings sheet */
+function openSheet(on) { $('#sheet').hidden = !on; $('#scrim').hidden = !on; if (!on) $('#customBox').hidden = true; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#sheet').hidden) openSheet(false); });
 
 /* location + tradition controls */
 function fillLoc() {
@@ -1249,6 +1431,7 @@ function fillLoc() {
   $('#cTz').innerHTML = tzs.map(z => `<option>${z}</option>`).join('');
   $('#cTz').value = S.loc.tz;
   if (S.loc.id === 'custom') { $('#cLat').value = S.loc.lat; $('#cLon').value = S.loc.lon; }
+  $('#locLabel').textContent = S.loc.name;
 }
 function setLoc(l) {
   S.loc = l; store.set('loc', l.id === 'custom' ? l : l.id);
@@ -1257,25 +1440,29 @@ function setLoc(l) {
 }
 $('#loc').addEventListener('change', e => {
   if (e.target.value === 'custom') { $('#customBox').hidden = false; return; }
-  $('#customBox').hidden = true; setLoc(LOCS.find(l => l.id === e.target.value));
+  $('#customBox').hidden = true; setLoc(LOCS.find(l => l.id === e.target.value)); openSheet(false);
 });
 $('#cApply').addEventListener('click', () => {
   const lat = parseFloat($('#cLat').value), lon = parseFloat($('#cLon').value), tz = $('#cTz').value;
   if (!(Math.abs(lat) <= 66) || !(Math.abs(lon) <= 180)) { $('#cLat').setCustomValidity('Latitude must be between -66 and 66, longitude between -180 and 180'); $('#cLat').reportValidity(); return; }
   $('#cLat').setCustomValidity('');
   $('#customBox').hidden = true;
-  setLoc({ id: 'custom', name: `${lat.toFixed(2)}, ${lon.toFixed(2)}`, lat, lon, tz });
+  setLoc({ id: 'custom', name: `${lat.toFixed(2)}, ${lon.toFixed(2)}`, lat, lon, tz }); openSheet(false);
 });
 $('#trad').value = S.trad;
 $('#trad').addEventListener('change', e => { S.trad = e.target.value; store.set('trad', S.trad); render(); });
+
+/* install as app (PWA) on the live site */
+if ('serviceWorker' in navigator && /vercel\.app$|^localhost$/.test(location.hostname)) { try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {} }
 
 /* boot */
 (function boot() {
   fillLoc();
   S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; S.festYear = S.sel.y;
+  render();
   const h = (location.hash || '').slice(1);
-  if (h.startsWith('vrat-') && GUIDES[h.slice(5)]) { S.guide = h.slice(5); show('vrat', false); }
-  else show(['day', 'month', 'fest', 'vrat'].includes(h) ? h : 'day', false);
+  if (h.startsWith('vrat-') && GUIDES[h.slice(5)]) openGuide(h.slice(5));
+  else if (h === 'fest') openPanel('fest');
 })();
 
 </script>
