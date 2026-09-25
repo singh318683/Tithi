@@ -318,6 +318,83 @@ details.more[open] summary::after{transform:rotate(180deg)}
 .panelbody{padding:16px 16px calc(40px + env(safe-area-inset-bottom,0px))}
 @media (prefers-reduced-motion:no-preference){.panel:not([hidden]){animation:slidein .22s ease}@keyframes slidein{from{transform:translate(-45%,0);opacity:.5}to{transform:translate(-50%,0);opacity:1}}}
 .gdetail h2{font-size:clamp(34px,10vw,44px)}
+
+/* ===== One screen, no scrolling ===== */
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+.app{height:100vh;height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.appbar{position:relative;top:auto;flex:none;padding:calc(6px + env(safe-area-inset-top,0px)) 10px 6px}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;gap:8px;padding:8px 14px 6px;overflow:hidden}
+#v-day{flex:none;display:flex;flex-direction:column;gap:7px}
+#v-month{flex:1;min-height:0;display:flex;flex-direction:column;gap:4px}
+.dnav{display:flex;gap:6px;align-items:center}
+.round{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1;display:grid;place-items:center;cursor:pointer;flex:none;padding:0}
+.round.sm{width:30px;height:30px;font-size:18px}
+.round.today{color:var(--kumkum);font-size:17px}
+.dnav .datepill{height:36px;font-size:14.5px}
+.hero2{display:flex;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 14px;position:relative;overflow:hidden}
+.hero2::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:repeating-linear-gradient(90deg,var(--kumkum) 0 14px,var(--haldi) 14px 28px)}
+.hl{flex:1;min-width:0}
+.thi{font-family:var(--display);font-size:clamp(32px,9.5vw,42px);line-height:1.15;padding-top:4px}
+.ten{font-weight:700;font-size:14.5px;line-height:1.3}
+.ten span{font-weight:400;color:var(--muted)}
+.tmeta{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmeta .dev{font-size:14px;color:var(--ink)}
+.hm{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);font-weight:600}
+.hm svg{width:52px;height:52px}
+.chiprow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-inline:-14px;padding-inline:14px}
+.chiprow::-webkit-scrollbar{display:none}
+.chiprow .chip{white-space:nowrap;padding:4px 11px;font-size:13px;flex:none}
+.chip.parana-chip{background:var(--peacock);color:var(--surface)}
+.chip.moon-chip{background:var(--night);color:var(--surface)}
+.strip{margin-top:0;gap:5px}
+.strip div{padding:5px 4px;border-radius:10px}
+.strip small{font-size:10.5px}
+.strip b{font-size:13px}
+.nextrow{display:flex;align-items:center;gap:4px;width:100%;border:1px dashed var(--line);background:transparent;border-radius:10px;padding:6px 10px;font-size:13px;cursor:pointer;text-align:left}
+.nextrow .nx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+.nextrow .nx b{color:var(--ink)}
+.nextrow .nd{font-weight:700;color:var(--kumkum);white-space:nowrap}
+.calhead2{display:flex;align-items:center;gap:8px;flex:none}
+.calhead2 .ct{flex:1;text-align:center;line-height:1.15}
+.calhead2 .ct b{font-size:15px}
+.calhead2 .ct small{display:block;color:var(--muted);font-size:11.5px}
+.cal2{flex:1;min-height:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-template-rows:auto repeat(var(--rows),minmax(0,1fr));gap:3px}
+.cal2 .wd{font-size:10.5px;font-weight:700;color:var(--muted);text-align:center;padding-bottom:1px}
+.cal2 .wd.sun{color:var(--kumkum)}
+.cal2 .cell{min-height:0;height:auto;border-radius:9px;padding:2px 3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;text-align:center;overflow:hidden;background:var(--surface);border:1px solid var(--line)}
+.cal2 .cell.out{visibility:hidden}
+.cal2 .dn{font-size:15px;font-weight:700;line-height:1.1}
+.cal2 .ti{font-size:9.5px;color:var(--muted);line-height:1.1}
+.cal2 .dots{display:flex;gap:2px;height:6px;margin-top:1px}
+.cal2 .dots .dot{width:5px;height:5px;margin:0}
+.cal2 .cell.purnima .ti{color:var(--haldi);font-size:12px}
+.cal2 .cell.amavasya .ti{color:var(--night);font-size:12px}
+.cal2 .cell.today{border-color:var(--kumkum);box-shadow:inset 0 0 0 1px var(--kumkum)}
+.cal2 .cell.sel{background:var(--kumkum);border-color:var(--kumkum)}
+.cal2 .cell.sel .dn,.cal2 .cell.sel .ti{color:#fff}
+.actions{flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+.actions button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;color:var(--ink);font-size:12px;font-weight:600;cursor:pointer;border-radius:12px}
+.actions button:active{background:var(--sunk)}
+.actions svg{width:24px;height:24px;color:var(--kumkum)}
+.panel{-webkit-overflow-scrolling:touch}
+.morehead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.morehead .dev{font-size:34px;line-height:1.2}
+.sub{color:var(--muted);font-size:13px}
+.gcard small{font-size:12.5px}
+
+@media (max-height:740px){
+  .thi{font-size:32px}
+  .hero2{padding:8px 12px}
+  .hm svg{width:44px;height:44px}
+  .content{gap:6px}
+  #v-day{gap:6px}
+  .cal2 .cell:not(.purnima):not(.amavasya) .ti{display:none}
+  .cal2 .cell.purnima .ti,.cal2 .cell.amavasya .ti{font-size:9px;line-height:1}
+  .cal2 .dn{font-size:14px}
+}
+@media (max-height:640px){ .nextrow{display:none} .tmeta{display:none} }
+/* very short screens (landscape, small phones): allow scrolling as a fallback */
+@media (max-height:560px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.content{overflow:visible}.cal2{min-height:300px}}
 </style>
 </head>
 <body>
@@ -332,16 +409,14 @@ details.more[open] summary::after{transform:rotate(180deg)}
 
   <main class="content">
     <section id="v-day"></section>
-    <section class="blk">
-      <div class="blkhead"><h2><span class="dev">आगामी</span> Coming up</h2><button type="button" class="linkbtn" data-allfest="1">All festivals ›</button></div>
-      <div id="v-up"></div>
-    </section>
-    <section class="blk" id="v-month"></section>
-    <section class="blk">
-      <div class="blkhead"><h2><span class="dev">व्रत विधि</span> Fasting guides</h2></div>
-      <div id="v-vrat"></div>
-    </section>
+    <section id="v-month"></section>
   </main>
+
+  <nav class="actions">
+    <button type="button" data-panel="more"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Panchang</span></button>
+    <button type="button" data-panel="fest"><svg viewBox="0 0 24 24"><path d="M12 3c2 3 3 5 3 7a3 3 0 0 1-6 0c0-2 1-4 3-7z"/><path d="M5 17h14l-2 4H7z"/><path d="M12 13v4"/></svg><span>Festivals</span></button>
+    <button type="button" data-panel="guides"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 7h6"/></svg><span>Vrat guides</span></button>
+  </nav>
 
   <div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle" hidden>
     <header class="panelbar">
@@ -1161,70 +1236,71 @@ function ekadashiParana(o) { // o: {y,m,d} of Ekadashi observance
   return { day: nd, start, end, hv, note };
 }
 
-/* ---------- Day view ---------- */
-function renderDay() {
-  const s = S.sel, L = S.loc, t = todayIn(L.tz);
-  const f = P.fullDay(s.y, s.m, s.d, L);
-  const ml = monthLabel(f, f.tithi);
-  const obs = obsOn(s);
-  const weekly = WEEKLY[f.wd];
-  const pk = paksha(f.tithi);
-  const illum = Math.round(f.illum * 100);
-  const isToday = keyOf(s) === keyOf(t);
-
-  // parana (on ekadashi day or the day after)
-  let paranaHTML = '';
+/* ---------- Day (compact, one screen) ---------- */
+function dayExtras(s, f, obs) {
   const ekToday = obs.find(o => o.recurring === 'ekadashi');
   const prev = addDays(s, -1); const ekPrev = obsOn(prev).find(o => o.recurring === 'ekadashi');
   const pr = ekToday ? ekadashiParana(s) : ekPrev ? ekadashiParana(prev) : null;
-  if (pr) paranaHTML = `<div class="parana"><b>${ekToday ? 'Parana tomorrow' : 'Ekadashi parana today'}</b> (${WD[new Date(Date.UTC(pr.day.y, pr.day.m, pr.day.d)).getUTCDay()]}, ${MON[pr.day.m]} ${pr.day.d}): <span class="num"><b>${fmtT(pr.start)} – ${fmtT(pr.end)}</b></span>. Hari Vasara ends ${fmtT(pr.hv, pr.day)}. ${pr.note}</div>`;
-
-  const sankashti = obs.find(o => o.recurring === 'sankashti' || o.name === 'Karva Chauth');
-  let moonNote = '';
-  if (sankashti) moonNote = `<div class="parana" style="border-color:var(--night);background:var(--night-soft)"><b style="color:var(--night)">Moonrise for arghya:</b> <span class="num"><b>${fmtT(f.moonrise)}</b></span> in ${esc(L.name)}. The fast is broken after offering arghya to the moon.</div>`;
-
-  // upcoming
-  const ups = [];
-  for (const y of [s.y, s.y + 1]) { for (const o of obsYear(y).list) { const od = { y: o.b.y, m: o.b.m, d: o.b.d }; const dd = dayDiff(s, od); if (dd > 0 && o.kind !== 'solar') ups.push([dd, od, o]); } if (ups.length >= 10) break; }
-  const _unused = ups.slice(0, 0).map(([dd, od, o]) => `<li data-date="${keyOf(od)}"><span class="when num">${MON[od.m]} ${od.d}<small>${WD[new Date(Date.UTC(od.y, od.m, od.d)).getUTCDay()]}</small></span><span><span class="dot ${o.kind}"></span>${esc(o.name)}</span><span class="in num">in ${dd} day${dd > 1 ? 's' : ''}</span></li>`).join('');
-
+  const moonFast = obs.find(o => o.recurring === 'sankashti' || o.name === 'Karva Chauth');
+  return { pr, ekToday, moonFast };
+}
+function renderDay() {
+  const s = S.sel, L = S.loc, t = todayIn(L.tz);
+  const f = P.fullDay(s.y, s.m, s.d, L);
+  S.f = f;
+  const ml = monthLabel(f, f.tithi), obs = obsOn(s), weekly = WEEKLY[f.wd], pk = paksha(f.tithi);
+  const isToday = keyOf(s) === keyOf(t);
+  const x = dayExtras(s, f, obs);
+  let chips = obs.map(chip).join('');
+  if (x.pr) chips += `<button type="button" class="chip parana-chip" data-panel="more">Parana ${x.ekToday ? 'tomorrow ' : ''}${fmtT(x.pr.start)}–${fmtT(x.pr.end)}</button>`;
+  if (x.moonFast && f.moonrise) chips += `<button type="button" class="chip moon-chip" data-panel="more">Moonrise ${fmtT(f.moonrise)}</button>`;
+  if (weekly) chips += `<button type="button" class="chip weekly" data-guide="${weekly}">${GUIDES[weekly].name.replace(/ \(.*\)/, '')}</button>`;
+  // next observance
+  let next = null;
+  for (const y of [s.y, s.y + 1]) { for (const o of obsYear(y).list) { const od = { y: o.b.y, m: o.b.m, d: o.b.d }; const dd = dayDiff(s, od); if (dd > 0 && o.kind !== 'solar') { next = [dd, od, o]; break; } } if (next) break; }
   $('#v-day').innerHTML = `
-  <div class="daynav">
+  <div class="dnav">
     <button type="button" class="round" data-step="-1" aria-label="Previous day">‹</button>
-    <label class="datepill"><span>${isToday ? 'Today' : WD[f.wd] + ', ' + MON[s.m] + ' ' + s.d}</span><input type="date" id="pick" value="${s.y}-${String(s.m + 1).padStart(2, '0')}-${String(s.d).padStart(2, '0')}" aria-label="Pick a date"></label>
+    <label class="datepill"><span class="num">${WD[f.wd]}, ${MON[s.m]} ${s.d}${isToday ? ' · Today' : ''}</span><input type="date" id="pick" value="${s.y}-${String(s.m + 1).padStart(2, '0')}-${String(s.d).padStart(2, '0')}" aria-label="Pick a date"></label>
     <button type="button" class="round" data-step="1" aria-label="Next day">›</button>
-    ${isToday ? '' : '<button type="button" class="todaybtn" data-today="1">Back to today</button>'}
+    ${isToday ? '' : '<button type="button" class="round today" data-today="1" aria-label="Back to today">⟲</button>'}
   </div>
-  <div class="hero">
-    <div>
-      <div class="greg">${WD_FULL[f.wd]} · ${MON[s.m]} ${s.d}, ${s.y}</div>
-      <div class="tithi-hi">${P.tithiNameHi(f.tithi)}</div>
-      <div class="tithi-en">${pk === 'Shukla' ? 'Shukla' : 'Krishna'} ${P.tithiName(f.tithi)} <span>till ${fmtT(f.tEnd, s)}, then ${P.tithiName(f.tNext)}</span></div>
-      <div class="meta">
-        <span><b class="dev" style="font-size:17px">${ml.hi}</b> ${ml.en} ${pk === 'Shukla' ? 'शुक्ल' : 'कृष्ण'} पक्ष</span>
-        <span>Vikram Samvat <b class="num">${vikram(f)}</b></span>
-        <span>Shaka <b class="num">${vikram(f) - 135}</b></span>
-        <span><b class="dev" style="font-size:17px">${P.VAARA_HI[f.wd]}</b></span>
-      </div>
-      ${(obs.length || weekly) ? `<div class="chips">${obs.map(chip).join('')}${weekly ? `<button type="button" class="chip weekly" data-guide="${weekly}">${GUIDES[weekly].name} <span class="arrow">→</span></button>` : ''}</div>` : ''}
-      ${paranaHTML}${moonNote}
+  <div class="hero2">
+    <div class="hl">
+      <div class="thi">${P.tithiNameHi(f.tithi)}</div>
+      <div class="ten">${pk} ${P.tithiName(f.tithi)} <span>till ${fmtT(f.tEnd, s)}</span></div>
+      <div class="tmeta"><span class="dev">${ml.hi} ${pk === 'Shukla' ? 'शुक्ल' : 'कृष्ण'}</span> · ${P.NAK[f.nak]} · VS <span class="num">${vikram(f)}</span></div>
     </div>
-    <div class="moonbox">${moonSVG(f.elong)}<div><b class="num">${illum}%</b> lit<br>${f.elong < 180 ? 'Waxing' : 'Waning'}</div></div>
+    <div class="hm">${moonSVG(f.elong)}<span class="num">${Math.round(f.illum * 100)}%</span></div>
   </div>
+  ${chips ? `<div class="chiprow">${chips}</div>` : ''}
   <div class="strip num">
     <div><small>Sunrise</small><b>${fmtT(f.rise)}</b></div>
     <div><small>Sunset</small><b>${fmtT(f.set)}</b></div>
     <div><small>Moonrise</small><b>${f.moonrise ? fmtT(f.moonrise) : '—'}</b></div>
     <div class="bad"><small>Rahu kaal</small><b>${fmtT(f.rahu[0])}</b></div>
   </div>
-  <details class="more" id="moreBox"${S.more ? ' open' : ''}><summary>Full panchang &amp; muhurat</summary><div class="grid2">
+  ${next ? `<button type="button" class="nextrow" data-date="${keyOf(next[1])}"><span class="dot ${next[2].kind}"></span><span class="nx">Next: <b>${esc(next[2].name)}</b></span><span class="num nd">${next[0] === 1 ? 'Tomorrow' : MON[next[1].m] + ' ' + next[1].d}</span></button>` : ''}`;
+}
+
+function renderMore() {
+  const s = S.sel, f = S.f || P.fullDay(s.y, s.m, s.d, S.loc), pk = paksha(f.tithi), obs = obsOn(s), ml = monthLabel(f, f.tithi);
+  const x = dayExtras(s, f, obs);
+  let notes = '';
+  if (x.pr) notes += `<div class="parana"><b>${x.ekToday ? 'Parana tomorrow' : 'Ekadashi parana today'}</b> (${WD[new Date(Date.UTC(x.pr.day.y, x.pr.day.m, x.pr.day.d)).getUTCDay()]}, ${MON[x.pr.day.m]} ${x.pr.day.d}): <span class="num"><b>${fmtT(x.pr.start)} – ${fmtT(x.pr.end)}</b></span>. Hari Vasara ends ${fmtT(x.pr.hv, x.pr.day)}. ${x.pr.note}</div>`;
+  if (x.moonFast) notes += `<div class="parana" style="border-color:var(--night);background:var(--night-soft)"><b style="color:var(--night)">Moonrise for arghya:</b> <span class="num"><b>${fmtT(f.moonrise)}</b></span> in ${esc(S.loc.name)}. Break the fast after offering arghya to the moon.</div>`;
+  setPanel(`Panchang · ${MON[s.m]} ${s.d}`, `
+  <div class="morehead"><span class="dev">${P.tithiNameHi(f.tithi)}</span><span>${WD_FULL[f.wd]}, ${MONTH_FULL[s.m]} ${s.d}, ${s.y}</span></div>
+  <p class="sub" style="margin:0 0 12px">${ml.en} ${pk} paksha · Vikram Samvat ${vikram(f)} · Shaka ${vikram(f) - 135} · ${esc(S.loc.name)}</p>
+  ${notes}
+  <div class="grid2">
     <div class="card"><h3>Panchang at sunrise</h3>
       <dl class="rows num">
-        <dt>Tithi</dt><dd>${pk} ${P.tithiName(f.tithi)}<small>${fmtT(f.tStart, s)} → ${fmtT(f.tEnd, s)}</small></dd>
+        <dt>Tithi</dt><dd>${pk} ${P.tithiName(f.tithi)}<small>${fmtT(f.tStart, s)} → ${fmtT(f.tEnd, s)}, then ${P.tithiName(f.tNext)}</small></dd>
         <dt>Nakshatra</dt><dd>${P.NAK[f.nak]}<small>till ${fmtT(f.nEnd, s)} · then ${P.NAK[f.nNext]}</small></dd>
         <dt>Yoga</dt><dd>${P.YOGA[f.yoga]}<small>till ${fmtT(f.yEnd, s)}</small></dd>
         <dt>Karana</dt><dd>${P.karanaName(f.karana)}<small>till ${fmtT(f.kEnd, s)}</small></dd>
-        <dt>Vaara</dt><dd>${P.VAARA[f.wd]}</dd>
+        <dt>Vaara</dt><dd>${P.VAARA[f.wd]} <span class="dev">${P.VAARA_HI[f.wd]}</span></dd>
         <dt>Sun sign</dt><dd>${P.RASHI[f.sunRashi]}</dd>
         <dt>Moon sign</dt><dd>${P.RASHI[f.moonRashi]}</dd>
       </dl>
@@ -1235,6 +1311,7 @@ function renderDay() {
         <dt>Sunset</dt><dd>${fmtT(f.set, s)}</dd>
         <dt>Moonrise</dt><dd>${f.moonrise ? fmtT(f.moonrise, s) : 'No moonrise this date'}</dd>
         <dt>Moonset</dt><dd>${f.moonset ? fmtT(f.moonset, s) : 'No moonset this date'}</dd>
+        <dt>Moon</dt><dd>${Math.round(f.illum * 100)}% lit, ${f.elong < 180 ? 'waxing' : 'waning'}</dd>
         <dt>Brahma muhurta</dt><dd class="good">${fmtRange(f.brahma, s)}</dd>
         <dt>Abhijit muhurta</dt><dd class="good">${f.wd === 3 ? '<small>Not used on Wednesday</small>' : fmtRange(f.abhijit, s)}</dd>
         <dt>Rahu kaal</dt><dd class="bad">${fmtRange(f.rahu, s)}</dd>
@@ -1242,61 +1319,42 @@ function renderDay() {
         <dt>Gulika kaal</dt><dd class="bad">${fmtRange(f.gulika, s)}</dd>
       </dl>
     </div>
-  </div></details>`;
-  renderUp(ups);
+  </div>`);
 }
 
-function renderUp(ups) {
-  $('#v-up').innerHTML = `<div class="upscroll">${ups.slice(0, 12).map(([dd, od, o]) => `<button type="button" class="upcard ${o.kind}" data-date="${keyOf(od)}">
-    <span class="uwhen num">${WD[new Date(Date.UTC(od.y, od.m, od.d)).getUTCDay()]}, ${MON[od.m]} ${od.d}</span>
-    <span class="uname">${esc(o.name)}</span>
-    <span class="uhi dev">${esc(o.hi)}</span>
-    <span class="uin num">${dd === 1 ? 'Tomorrow' : 'in ' + dd + ' days'}</span></button>`).join('')}</div>`;
-}
-
-/* ---------- Month view ---------- */
+/* ---------- Month (fills remaining screen) ---------- */
 function renderMonth() {
   const { y, m } = S.cal, L = S.loc, t = todayIn(L.tz);
   const first = new Date(Date.UTC(y, m, 1)).getUTCDay(), n = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+  const rows = Math.ceil((first + n) / 7);
   const b1 = P.basicDay(y, m, 1, L), bn = P.basicDay(y, m, n, L);
   const l1 = monthLabel(b1, b1.ti.sunrise), l2 = monthLabel(bn, bn.ti.sunrise);
-  let cells = WD.map((w, i) => `<div class="wd${i === 0 ? ' sun' : ''}">${w}</div>`).join('');
+  let cells = WD.map((w, i) => `<div class="wd${i === 0 ? ' sun' : ''}">${w[0]}</div>`).join('');
   for (let i = 0; i < first; i++) cells += '<div class="cell out" aria-hidden="true"></div>';
   for (let d = 1; d <= n; d++) {
     const b = P.basicDay(y, m, d, L), ti = b.ti.sunrise, o = { y, m, d };
     const ev = obsOn(o);
-    const special = ti === 14 || ti === 29 || ti === 10 || ti === 25;
-    const lbl = `${ti < 15 ? 'S' : 'K'}${(ti % 15) + 1} ${P.tithiName(ti)}`;
+    const code = `${ti < 15 ? 'S' : 'K'}${(ti % 15) + 1}`;
     const cls = ['cell']; if (keyOf(o) === keyOf(t)) cls.push('today'); if (keyOf(o) === keyOf(S.sel)) cls.push('sel');
-    const mainEv = ev.filter(e => e.kind !== 'solar' || /Makar|Mesha/.test(e.name));
-    cells += `<button type="button" class="${cls.join(' ')}" data-date="${keyOf(o)}" aria-label="${MONTH_FULL[m]} ${d}, ${lbl}${ev.length ? ', ' + ev.map(e => e.name).join(', ') : ''}">
-      <span class="top"><span class="dn num">${d}</span>${special && (ti === 14 || ti === 29) ? moonSVG(P.elong(b.rise), 'mini-moon') : ''}</span>
-      <span class="ti"><b>${ti < 15 ? 'S' : 'K'}${(ti % 15) + 1}</b><span class="tn"> ${P.tithiName(ti)}</span></span>
-      ${mainEv.slice(0, 2).map(e => `<span class="ev ${e.kind}">${esc(e.name)}</span>`).join('')}
-      <span class="dots">${ev.slice(0, 4).map(e => `<span class="dot ${e.kind}"></span>`).join('')}</span>
-    </button>`;
+    if (ti === 14) cls.push('purnima'); if (ti === 29) cls.push('amavasya');
+    cells += `<button type="button" class="${cls.join(' ')}" data-pick="${keyOf(o)}" aria-label="${MONTH_FULL[m]} ${d}, ${paksha(ti)} ${P.tithiName(ti)}${ev.length ? ', ' + ev.map(e => e.name).join(', ') : ''}">
+      <span class="dn num">${d}</span><span class="ti">${ti === 14 ? '○' : ti === 29 ? '●' : code}</span>
+      <span class="dots">${ev.slice(0, 3).map(e => `<span class="dot ${e.kind}"></span>`).join('')}</span></button>`;
   }
   $('#v-month').innerHTML = `
-  <div class="calhead">
-    <h2>${MONTH_FULL[m]} ${y}<small>${l1.en}${l1.en !== l2.en ? ' – ' + l2.en : ''} · Vikram Samvat ${vikram(bn)} · ${esc(L.name)}</small></h2>
-    <button type="button" data-mstep="-1" aria-label="Previous month">←</button>
-    <button type="button" data-mthis="1">Now</button>
-    <button type="button" data-mstep="1" aria-label="Next month">→</button>
+  <div class="calhead2">
+    <button type="button" class="round sm" data-mstep="-1" aria-label="Previous month">‹</button>
+    <div class="ct"><b>${MONTH_FULL[m]} ${y}</b><small>${l1.en}${l1.en !== l2.en ? ' – ' + l2.en : ''}</small></div>
+    <button type="button" class="round sm" data-mstep="1" aria-label="Next month">›</button>
   </div>
-  <div class="cal">${cells}</div>
-  <div class="legend"><span><span class="dot vrat"></span>Vrat / fast</span><span><span class="dot festival"></span>Festival</span><span><span class="dot observance"></span>Amavasya / Pitru</span><span><span class="dot solar"></span>Sankranti</span><span>S = Shukla, K = Krishna paksha (tithi at sunrise)</span></div>`;
+  <div class="cal2" style="--rows:${rows}">${cells}</div>`;
 }
 
-function daySummary() {
-  const s = S.sel; if (s.y !== S.cal.y || s.m !== S.cal.m) return '';
-  const b = P.basicDay(s.y, s.m, s.d, S.loc), ti = b.ti.sunrise, ml = monthLabel(b, ti), ev = obsOn(s);
-  return `<div class="card daysum">
-    <div class="row"><span class="dev">${P.tithiNameHi(ti)}</span><span class="sub num">${WD[b.wd]}, ${MON[s.m]} ${s.d}</span></div>
-    <div><b>${paksha(ti)} ${P.tithiName(ti)}</b> <span class="sub">· ${ml.en}</span></div>
-    <div class="sub num">Sunrise ${fmtT(b.rise)} · Sunset ${fmtT(b.set)}</div>
-    ${ev.length ? `<div class="chips">${ev.map(chip).join('')}</div>` : ''}
-    <button type="button" class="primary open" data-openday="1">Full panchang for this day</button>
-  </div>`;
+/* ---------- Vrat guides list (panel) ---------- */
+function renderGuides() {
+  setPanel('Vrat vidhi · Fasting guides', `
+    <div class="note">Every vrat starts with a <b>sankalp</b>: after bathing, hold water in your right palm, say your name, the day and why you are keeping the fast, then let the water fall. A lighter fast kept with devotion is better than a strict one you cannot finish.</div>
+    <div class="gcards">${Object.entries(GUIDES).map(([k, v]) => `<button type="button" class="gcard" data-guide="${k}"><span class="dev">${v.hi}</span><b>${v.name}</b><small>${v.deity} · ${v.freq}</small></button>`).join('')}</div>`);
 }
 
 /* ---------- Festivals view ---------- */
@@ -1330,13 +1388,6 @@ function nextDatesFor(key) {
   for (const y of [t.y, t.y + 1]) for (const o of obsYear(y).list) { if (o.g !== key) continue; const od = { y: o.b.y, m: o.b.m, d: o.b.d }; if (dayDiff(t, od) >= 0 && out.length < 6) out.push([od, o.name]); }
   return out;
 }
-function renderVrat() {
-  {
-    $('#v-vrat').innerHTML = `
-    <div class="note">Every vrat starts with a <b>sankalp</b>: after bathing, hold water in your right palm, say your name, the day and why you are keeping the fast, then let the water fall. Keep what you promise. A lighter fast done with devotion is better than a strict one you cannot finish.</div>
-    <div class="gcards">${Object.entries(GUIDES).map(([k, v]) => `<button type="button" class="gcard" data-guide="${k}"><span class="dev">${v.hi}</span><b>${v.name}</b><small>${v.deity}</small><small>${v.freq}</small></button>`).join('')}</div>`;
-  }
-}
 function renderGuide() {
   const g = GUIDES[S.guide];
   const done = store.get('chk-' + S.guide, []);
@@ -1362,25 +1413,27 @@ function renderGuide() {
   </div>`);
 }
 
-/* ---------- one-page rendering & panel ---------- */
+/* ---------- one-screen rendering & panels ---------- */
 function setPanel(title, html) { $('#panelTitle').textContent = title; $('#panelBody').innerHTML = html; }
+function drawPanel() { const k = S.panel; if (k === 'fest') renderFest(); else if (k === 'guides') renderGuides(); else if (k === 'guide') renderGuide(); else if (k === 'more') renderMore(); }
 function openPanel(kind) {
-  S.panel = kind;
-  if (kind === 'fest') renderFest(); else renderGuide();
-  const p = $('#panel'); const wasOpen = !p.hidden; p.hidden = false; if (!wasOpen) p.scrollTop = 0;
-  document.body.classList.add('locked');
-  try { history.replaceState(null, '', '#' + (kind === 'fest' ? 'fest' : 'vrat-' + S.guide)); } catch (e) {}
+  if (kind === 'guide' && S.panel === 'guides') S.fromGuides = true; else if (kind !== 'guide') S.fromGuides = false;
+  S.panel = kind; drawPanel();
+  const p = $('#panel'); p.hidden = false; p.scrollTop = 0;
+  try { history.replaceState(null, '', '#' + (kind === 'guide' ? 'vrat-' + S.guide : kind)); } catch (e) {}
 }
 function closePanel() {
-  S.panel = null; $('#panel').hidden = true; document.body.classList.remove('locked');
+  if (S.panel === 'guide' && S.fromGuides) { S.fromGuides = false; return openPanel('guides'); }
+  S.panel = null; $('#panel').hidden = true;
   try { history.replaceState(null, '', location.pathname); } catch (e) {}
 }
 function render() {
-  try { renderDay(); renderMonth(); renderVrat(); if (S.panel) (S.panel === 'fest' ? renderFest() : renderGuide()); }
+  try { renderDay(); renderMonth(); if (S.panel) drawPanel(); }
   catch (err) { console.error(err); $('#v-day').innerHTML = `<p class="loading">Could not calculate for this place and date. Check the latitude, longitude and time zone.</p>`; }
 }
 function openGuide(k) { S.guide = k; openPanel('guide'); }
-function goDate(k) { const [y, m, d] = k.split('-').map(Number); S.sel = { y, m, d }; S.cal = { y, m }; if (S.panel) closePanel(); render(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function pickDate(k) { const [y, m, d] = k.split('-').map(Number); S.sel = { y, m, d }; S.cal = { y, m }; render(); }
+function goDate(k) { pickDate(k); if (S.panel) { S.fromGuides = false; closePanel(); } }
 
 document.addEventListener('click', e => {
   if (e.target.id === 'scrim') return openSheet(false);
@@ -1388,12 +1441,12 @@ document.addEventListener('click', e => {
   if (t.dataset.sheet) return openSheet(true);
   if (t.dataset.close) return openSheet(false);
   if (t.dataset.closepanel) return closePanel();
-  if (t.dataset.allfest) return openPanel('fest');
+  if (t.dataset.panel) return openPanel(t.dataset.panel);
   if (t.dataset.guide) return openGuide(t.dataset.guide);
+  if (t.dataset.pick) return pickDate(t.dataset.pick);
   if (t.dataset.step) { S.sel = addDays(S.sel, +t.dataset.step); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
   if (t.dataset.today) { S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; return render(); }
   if (t.dataset.mstep) { const d = new Date(Date.UTC(S.cal.y, S.cal.m + +t.dataset.mstep, 1)); S.cal = { y: d.getUTCFullYear(), m: d.getUTCMonth() }; return renderMonth(); }
-  if (t.dataset.mthis) { const n = todayIn(S.loc.tz); S.cal = { y: n.y, m: n.m }; return renderMonth(); }
   if (t.dataset.filter) { S.festFilter = t.dataset.filter; return renderFest(); }
   if (t.dataset.date) return goDate(t.dataset.date);
   if (t.dataset.reset) { store.set('chk-' + S.guide, []); return renderGuide(); }
@@ -1403,7 +1456,6 @@ document.addEventListener('click', e => {
     try { navigator.clipboard.writeText(txt).then(ok, () => selectText(t.parentElement.querySelector('.dev'))); } catch (err) { selectText(t.parentElement.querySelector('.dev')); }
   }
 });
-document.addEventListener('toggle', e => { if (e.target.id === 'moreBox') S.more = e.target.open; }, true);
 function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 document.addEventListener('change', e => {
   const t = e.target;
@@ -1416,6 +1468,12 @@ document.addEventListener('change', e => {
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.panel && $('#sheet').hidden) closePanel(); });
+// swipe left/right on the day card to change day
+(() => { let x0 = null, y0 = null; const el = () => $('#v-day');
+  document.addEventListener('touchstart', e => { if (!el().contains(e.target)) return; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', e => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5 && !e.target.closest('.chiprow')) { S.sel = addDays(S.sel, dx < 0 ? 1 : -1); S.cal = { y: S.sel.y, m: S.sel.m }; render(); } }, { passive: true });
+})();
 
 /* settings sheet */
 function openSheet(on) { $('#sheet').hidden = !on; $('#scrim').hidden = !on; if (!on) $('#customBox').hidden = true; }
@@ -1462,7 +1520,7 @@ if ('serviceWorker' in navigator && /vercel\.app$|^localhost$/.test(location.hos
   render();
   const h = (location.hash || '').slice(1);
   if (h.startsWith('vrat-') && GUIDES[h.slice(5)]) openGuide(h.slice(5));
-  else if (h === 'fest') openPanel('fest');
+  else if (['fest', 'guides', 'more'].includes(h)) openPanel(h);
 })();
 
 </script>
