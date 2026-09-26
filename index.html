@@ -489,6 +489,23 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 .why b{color:var(--ink)}
 .flist2 .why li{display:list-item;padding:0;border:0;cursor:default}
 
+
+.actions{grid-template-columns:repeat(5,1fr);gap:2px;padding-inline:4px}
+.actions button{font-size:11px}
+.dot.rem{background:var(--haldi);border-radius:1px;transform:rotate(45deg)}
+.chip.rem-chip{background:var(--haldi-soft);color:var(--ink)}
+.followbtn{border:1px dashed var(--haldi);background:transparent;border-radius:12px;padding:9px 12px;font-weight:600;cursor:pointer;text-align:left;color:var(--ink)}
+.followbtn.on{background:var(--haldi-soft);border-style:solid}
+.gtile.on{border-color:var(--haldi);background:var(--haldi-soft)}
+.field input{font-size:16px;color:var(--ink);border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;width:100%}
+.field .seg{margin-top:4px}
+.preview{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:14px}
+.preview .dev{font-size:30px;line-height:1.1;color:var(--kumkum)}
+.preview small{color:var(--muted);font-size:13.5px}
+.danger{color:var(--kumkum)!important;border-color:var(--kumkum)!important}
+.fit .seg button{font-size:12.5px;padding:7px 4px}
+
+.flist2 li.sechead{display:block;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--sunk);cursor:default}
 /* very short screens (landscape, small phones): allow scrolling as a fallback */
 @media (max-height:560px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.content{overflow:visible}.cal2{min-height:300px}}
 </style>
@@ -512,7 +529,8 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
     <button type="button" data-panel="more"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><span>Panchang</span></button>
     <button type="button" data-panel="fest"><svg viewBox="0 0 24 24"><path d="M12 3c2 3 3 5 3 7a3 3 0 0 1-6 0c0-2 1-4 3-7z"/><path d="M5 17h14l-2 4H7z"/><path d="M12 13v4"/></svg><span>Festivals</span></button>
     <button type="button" data-panel="muhurat"><svg viewBox="0 0 24 24"><circle cx="9" cy="14" r="5"/><circle cx="15" cy="14" r="5"/><path d="M10 5l2-2 2 2-2 2z"/></svg><span>Muhurat</span></button>
-    <button type="button" data-panel="guides"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 7h6"/></svg><span>Vrat guides</span></button>
+    <button type="button" data-panel="guides"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 7h6"/></svg><span>Vrat</span></button>
+    <button type="button" data-panel="reminders"><svg viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></svg><span>Reminders</span></button>
   </nav>
 
   <div class="panel" id="panel" role="dialog" aria-modal="true" aria-labelledby="panelTitle" hidden>
@@ -1437,6 +1455,7 @@ function renderDay() {
   if (x.moonFast && f.moonrise) chips += `<button type="button" class="chip moon-chip" data-panel="more">Moonrise ${fmtT(f.moonrise)}</button>`;
   const viv = vivahDay(s.y, s.m, s.d, L);
   if (viv.windows) chips += `<button type="button" class="chip vivah-chip" data-panel="muhurat">💍 Vivah muhurat ${fmtT(viv.windows[0][0])}</button>`;
+  for (const it of remindersOn(s)) chips += `<button type="button" class="chip rem-chip" ${it.rid ? `data-edit-open="${it.rid}"` : `data-guide="${it.fkey}"`}>${it.icon} ${esc(it.title)}</button>`;
   if (weekly) chips += `<button type="button" class="chip weekly" data-guide="${weekly}">${GUIDES[weekly].name.replace(/ \(.*\)/, '')}</button>`;
   // next observance
   let next = null;
@@ -1473,6 +1492,7 @@ function renderMonth() {
   const rows = Math.ceil((first + n) / 7);
   const b1 = P.basicDay(y, m, 1, L), bn = P.basicDay(y, m, n, L);
   const l1 = monthLabel(b1, b1.ti.sunrise), l2 = monthLabel(bn, bn.ti.sunrise);
+  const remDays = new Set(upcomingAll({ y, m, d: 1 }, 31).map(it => keyOf(it.o)));
   let cells = WD.map((w, i) => `<div class="wd${i === 0 ? ' sun' : ''}">${w[0]}</div>`).join('');
   for (let i = 0; i < first; i++) cells += '<div class="cell out" aria-hidden="true"></div>';
   for (let d = 1; d <= n; d++) {
@@ -1483,7 +1503,7 @@ function renderMonth() {
     if (ti === 14) cls.push('purnima'); if (ti === 29) cls.push('amavasya');
     cells += `<button type="button" class="${cls.join(' ')}" data-pick="${keyOf(o)}" aria-label="${MONTH_FULL[m]} ${d}, ${paksha(ti)} ${P.tithiName(ti)}${ev.length ? ', ' + ev.map(e => e.name).join(', ') : ''}">
       <span class="dn num">${d}</span><span class="ti">${ti === 14 ? '○' : ti === 29 ? '●' : code}</span>
-      <span class="dots">${ev.slice(0, 3).map(e => `<span class="dot ${e.kind}"></span>`).join('')}${vivahDay(y, m, d, L).windows ? '<span class="dot shubh"></span>' : ''}</span></button>`;
+      <span class="dots">${ev.slice(0, 3).map(e => `<span class="dot ${e.kind}"></span>`).join('')}${vivahDay(y, m, d, L).windows ? '<span class="dot shubh"></span>' : ''}${remDays.has(keyOf(o)) ? '<span class="dot rem"></span>' : ''}</span></button>`;
   }
   $('#v-month').innerHTML = `
   <div class="calhead2">
@@ -1579,6 +1599,7 @@ function pageGuide(v) {
     <div class="ghead"><span class="dev">${g.hi}</span><span class="sub">${g.deity} · ${g.freq}</span></div>
     <p class="about">${g.about}</p>
     ${nd.length ? `<div class="nextdates">${nd.slice(0, 4).map(([o]) => `<span class="num">${WD[new Date(Date.UTC(o.y, o.m, o.d)).getUTCDay()]} ${MON[o.m]} ${o.d}</span>`).join('')}</div>` : ''}
+    <button type="button" class="followbtn ${follows().includes(v.key) ? 'on' : ''}" data-follow="${v.key}">${follows().includes(v.key) ? '🔔 Reminding you before each date' : '🔔 Remind me on these dates'}</button>
     <div class="stiles fill">${SECS.map(([k, l, s]) => `<button type="button" class="stile" data-sec="${k}"><b>${l}</b><small>${k === 'steps' ? `${done.length ? done.length + ' of ' : ''}${g.steps.length} steps` : s}</small></button>`).join('')}</div>`, 'fit');
 }
 
@@ -1628,15 +1649,131 @@ function pageMuhurat(v) {
     <p class="hint">Standard panchang rules: auspicious nakshatra and tithi, no Bhadra or bad yoga, no Kharmas, Chaturmas, Holashtak, Adhik maas, or Guru/Shukra asta. For a specific couple, a pandit also checks kundli, lagna and Guru-Chandra bal.</p>`, 'fit');
 }
 
+/* ---------- Reminders: personal dates (by tithi or English date) + followed vrats ---------- */
+const REM_KINDS = [['birthday', 'Birthday', '🎂'], ['anniversary', 'Anniversary', '💞'], ['shraddh', 'Shraddh / Punya tithi', '🪔'], ['other', 'Other', '🔔']];
+const remList = () => store.get('rems', []);
+const follows = () => store.get('follows', []);
+const remTime = () => store.get('remTime', 'morning');
+function tithiDatesInYear(y, mon, t) { // days in Gregorian year y whose sunrise tithi = t in amanta month mon (not adhika)
+  const out = []; const n0 = Date.UTC(y, 0, 1), n1 = Date.UTC(y + 1, 0, 1);
+  let prev = P.basicDay(y - 1, 11, 31, S.loc);
+  for (let ms = n0; ms < n1; ms += 86400000) {
+    const dt = new Date(ms), b = P.basicDay(dt.getUTCFullYear(), dt.getUTCMonth(), dt.getUTCDate(), S.loc);
+    const ti = b.ti.sunrise, pti = prev.ti.sunrise; prev = b;
+    if (b.month.adhika || b.month.idx !== mon) continue;
+    if ((ti === t && pti !== t) || (ti === (t + 1) % 30 && pti === (t + 29) % 30)) out.push({ y: b.y, m: b.m, d: b.d });
+  }
+  return out;
+}
+function remOccurrences(r, from, days) { // list of {y,m,d} within [from, from+days)
+  const out = [], end = addDays(from, days);
+  const inRange = o => dayDiff(from, o) >= 0 && dayDiff(o, end) > 0;
+  const [Y, M, D] = r.date.split('-').map(Number);
+  if (r.repeat === 'once') { const o = { y: Y, m: M - 1, d: D }; if (inRange(o)) out.push(o); return out; }
+  for (let y = from.y; y <= end.y; y++) {
+    if (r.repeat === 'date') { const o = { y, m: M - 1, d: D }; if (inRange(o) && y >= Y) out.push(o); }
+    else for (const o of tithiDatesInYear(y, r.mon, r.tithi)) if (inRange(o) && dayDiff({ y: Y, m: M - 1, d: D }, o) >= 0) out.push(o);
+  }
+  return out;
+}
+function followOccurrences(key, from, days) {
+  const out = [], end = addDays(from, days), wdIdx = WEEKLY.indexOf(key);
+  if (wdIdx > 0) { for (let i = 0; i < days; i++) { const o = addDays(from, i); if (new Date(Date.UTC(o.y, o.m, o.d)).getUTCDay() === wdIdx) out.push([o, GUIDES[key].name.replace(/ \(.*\)/, '')]); } return out; }
+  for (let y = from.y; y <= end.y; y++) for (const o of obsYear(y).list) {
+    if (o.g !== key) continue; const od = { y: o.b.y, m: o.b.m, d: o.b.d };
+    if (dayDiff(from, od) >= 0 && dayDiff(od, end) > 0) out.push([od, o.name]);
+  }
+  return out;
+}
+function tithiLabel(mon, t) { const ml = monthLabel({ month: { idx: mon, adhika: false } }, t); return `${ml.en} ${paksha(t)} ${P.tithiName(t)}`; }
+function upcomingAll(from, days) { // [{o, title, sub, icon, rid?, fkey?}]
+  const items = [];
+  for (const r of remList()) for (const o of remOccurrences(r, from, days)) {
+    const k = REM_KINDS.find(x => x[0] === r.kind) || REM_KINDS[3];
+    items.push({ o, title: r.name, sub: r.repeat === 'tithi' ? tithiLabel(r.mon, r.tithi) : r.repeat === 'date' ? 'Every year' : 'One time', icon: k[2], rid: r.id });
+  }
+  for (const key of follows()) for (const [o, name] of followOccurrences(key, from, days)) items.push({ o, title: name, sub: 'Vrat you follow', icon: '🔔', fkey: key });
+  items.sort((x, y) => dayDiff(y.o, x.o));
+  return items;
+}
+function remindersOn(o) { return upcomingAll(o, 1); }
+
+/* hand the schedule to the iPhone app, which sets real notifications */
+function syncNative() {
+  const h = window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.tithi; if (!h) return;
+  const t = todayIn(S.loc.tz), evening = remTime() === 'evening';
+  const items = upcomingAll(t, 400).slice(0, 60).map((it, i) => {
+    const mid = P.localMidnight(it.o.y, it.o.m, it.o.d, S.loc.tz);
+    const at = evening ? mid - 5 * 3600000 : mid + 7 * 3600000;
+    return { id: `tithi-${i}`, at, title: `${it.icon} ${it.title}`, body: evening ? `Tomorrow, ${WD_FULL[new Date(Date.UTC(it.o.y, it.o.m, it.o.d)).getUTCDay()]} · ${it.sub}` : `Today · ${it.sub}` };
+  }).filter(x => x.at > Date.now());
+  try { h.postMessage({ type: 'schedule', items }); } catch (e) {}
+}
+const isNative = () => !!(window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.tithi);
+
+/* calendar file for the website */
+function icsFile() {
+  const t = todayIn(S.loc.tz), items = upcomingAll(t, 3 * 366);
+  const pad = n => String(n).padStart(2, '0'), ds = o => `${o.y}${pad(o.m + 1)}${pad(o.d)}`;
+  const esc2 = s => String(s).replace(/[,;\\]/g, m => '\\' + m);
+  const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Ikshana Solutions//Tithi//EN', 'CALSCALE:GREGORIAN'];
+  items.forEach((it, i) => { const n = addDays(it.o, 1); lines.push('BEGIN:VEVENT', `UID:tithi-${ds(it.o)}-${i}@tithi`, `DTSTAMP:${ds(t)}T000000Z`, `DTSTART;VALUE=DATE:${ds(it.o)}`, `DTEND;VALUE=DATE:${ds(n)}`, `SUMMARY:${esc2(it.icon + ' ' + it.title)}`, `DESCRIPTION:${esc2(it.sub + ' (from Tithi)')}`, 'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc2(it.title)}`, remTime() === 'evening' ? 'TRIGGER:-PT5H' : 'TRIGGER:PT7H', 'END:VALARM', 'END:VEVENT'); });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+
+function pageReminders(v) {
+  const t = todayIn(S.loc.tz), native = isNative(), all = upcomingAll(t, 800);
+  const seen = new Set(), mine = all.filter(it => it.rid && !seen.has(it.rid) && seen.add(it.rid));
+  const vr = all.filter(it => it.fkey && dayDiff(t, it.o) < 400).slice(0, 12);
+  const head = s => `<li class="sechead">${s}</li>`;
+  const items = [...(mine.length ? [{ head: 'Your dates' }] : []), ...mine, ...(vr.length ? [{ head: 'Vrats you follow' }] : []), ...vr];
+  setPanel('Reminders', `
+    <div class="ghead sm"><span class="dev">याद दिलाएँ</span><span class="sub">Your dates and the vrats you follow</span></div>
+    <ul class="flist2 fill">${items.map(it => { if (it.head) return head(it.head); const dd = dayDiff(t, it.o);
+      return `<li ${it.rid ? `data-edit="${it.rid}"` : `data-guide="${it.fkey}"`}><span class="d num"><b>${it.o.d}</b><small>${MON[it.o.m]}</small></span><span class="n">${it.icon} ${esc(it.title)}<small>${esc(it.sub)}</small></span><span class="t num">${dd === 0 ? 'Today' : dd === 1 ? 'Tmrw' : dd + 'd'}</span></li>`; }).join('')
+      || '<li class="empty"><b>No reminders yet.</b><br>Save a birthday, anniversary or shraddh tithi, or follow a vrat such as Ekadashi.</li>'}</ul>
+    ${seg([['morning', '7 AM on the day'], ['evening', '7 PM the day before']], remTime(), 'data-remtime')}
+    <div class="pager"><button type="button" class="ghost" data-page="follow">🔔 Vrats</button><button type="button" class="primary" data-page="addrem">+ Add a date</button></div>
+    ${native ? '' : '<button type="button" class="linkbtn center" data-ics="1">📅 Add all to my phone calendar</button>'}`, 'fit');
+}
+
+function pageFollow(v) {
+  const g = GROUPS.find(x => x[0] === v.g), f = follows();
+  setPanel('Vrats to follow', `
+    ${seg(GROUPS.map(([k, l]) => [k, l]), v.g, 'data-grp')}
+    <div class="gtiles fill">${g[2].map(k => { const G = GUIDES[k], on = f.includes(k); return `<button type="button" class="gtile ${on ? 'on' : ''}" data-follow="${k}" aria-pressed="${on}"><span class="dev">${G.hi}</span><b>${G.name.replace(/ \(.*\)/, '')}</b><small>${on ? '🔔 Reminding you' : 'Tap to follow'}</small></button>`; }).join('')}</div>
+    <p class="hint">Followed vrats show up in Reminders${isNative() ? ' and send a notification' : ''} before each date.</p>`, 'fit');
+}
+
+function pageAddRem(v) {
+  const r = v.id ? remList().find(x => x.id === v.id) : null;
+  const d = v.draft || (v.draft = r ? { ...r } : { name: '', kind: 'birthday', date: `${S.sel.y}-${String(S.sel.m + 1).padStart(2, '0')}-${String(S.sel.d).padStart(2, '0')}`, repeat: 'tithi' });
+  const [Y, M, D] = d.date.split('-').map(Number), b = P.basicDay(Y, M - 1, D, S.loc);
+  d.tithi = b.ti.sunrise; d.mon = b.month.idx;
+  const next = remOccurrences(d, todayIn(S.loc.tz), 800)[0];
+  setPanel(r ? 'Edit reminder' : 'Add a date', `
+    <label class="field">Name<input id="remName" type="text" maxlength="40" placeholder="e.g. Maa's birthday" value="${esc(d.name)}" autocomplete="off"></label>
+    ${seg(REM_KINDS.map(([k, l, i]) => [k, i + ' ' + l.split(' ')[0]]), d.kind, 'data-rkind')}
+    <label class="field">Date it happened (or will happen)<input id="remDate" type="date" value="${d.date}"></label>
+    <div class="field">Repeat every year by${seg([['tithi', 'Hindu tithi'], ['date', 'English date'], ['once', 'Only once']], d.repeat, 'data-rrep')}</div>
+    <div class="card preview fill">
+      ${d.repeat === 'tithi' ? `<span class="dev">${P.tithiNameHi(d.tithi)}</span><b>${tithiLabel(d.mon, d.tithi)}</b>${b.month.adhika ? '<small>Born in Adhik maas; reminders use the regular month.</small>' : ''}` : `<b>${d.repeat === 'date' ? 'Every ' + MONTH_FULL[M - 1] + ' ' + D : WD_FULL[b.wd] + ', ' + MONTH_FULL[M - 1] + ' ' + D + ', ' + Y}</b>`}
+      <small>${next ? `Next: <b class="num">${WD[new Date(Date.UTC(next.y, next.m, next.d)).getUTCDay()]}, ${MON[next.m]} ${next.d}, ${next.y}</b>` : 'No upcoming date'}</small>
+    </div>
+    <div class="pager">${r ? '<button type="button" class="ghost danger" data-delrem="1">Delete</button>' : '<button type="button" class="ghost" data-closepanel="1">Cancel</button>'}<button type="button" class="primary" data-saverem="1">Save reminder</button></div>`, 'fit');
+}
+
 function drawPanel() {
   const v = top_(); if (!v) return;
-  ({ muhurat: pageMuhurat, more: pageMore, fest: pageFest, guides: pageGuides, guide: pageGuide, sec: pageSec, step: pageStep })[v.k](v);
+  ({ reminders: pageReminders, follow: pageFollow, addrem: pageAddRem, muhurat: pageMuhurat, more: pageMore, fest: pageFest, guides: pageGuides, guide: pageGuide, sec: pageSec, step: pageStep })[v.k](v);
 }
 function push(v) { S.stack.push(v); S.panel = true; drawPanel(); $('#panel').hidden = false; }
 function openRoot(k) {
   S.stack = [];
   if (k === 'more') push({ k: 'more', tab: 'p' });
   else if (k === 'fest') push({ k: 'fest', y: S.sel.y, m: S.sel.m });
+  else if (k === 'reminders') push({ k: 'reminders' });
   else if (k === 'muhurat') push({ k: 'muhurat', y: S.sel.y, m: S.sel.m });
   else push({ k: 'guides', g: 'monthly' });
 }
@@ -1656,7 +1793,7 @@ function goDate(k) { closeAll(); pickDate(k); }
 
 document.addEventListener('click', e => {
   if (e.target.id === 'scrim') return openSheet(false);
-  const t = e.target.closest('button, li[data-date]'); if (!t || t.disabled) return;
+  const t = e.target.closest('button, li[data-date], li[data-edit], li[data-guide]'); if (!t || t.disabled) return;
   const v = top_(), ds = t.dataset;
   if (ds.sheet) return openSheet(true);
   if (ds.close) return openSheet(false);
@@ -1668,6 +1805,24 @@ document.addEventListener('click', e => {
   if (ds.done != null) { const i = +ds.done; let d = store.get('chk-' + v.key, []); d = d.includes(i) ? d.filter(x => x !== i) : [...d, i]; store.set('chk-' + v.key, d); if (!d.includes(i)) return drawPanel(); if (i < GUIDES[v.key].steps.length - 1) v.i = i + 1; return drawPanel(); }
   if (ds.tabm) { v.tab = ds.tabm; return drawPanel(); }
   if (ds.grp) { v.g = ds.grp; return drawPanel(); }
+  if (ds.page) return push(ds.page === 'follow' ? { k: 'follow', g: 'monthly' } : { k: 'addrem' });
+  if (ds.edit) return push({ k: 'addrem', id: ds.edit });
+  if (ds.editOpen) { openRoot('reminders'); return push({ k: 'addrem', id: ds.editOpen }); }
+  if (ds.follow) { let f = follows(); f = f.includes(ds.follow) ? f.filter(x => x !== ds.follow) : [...f, ds.follow]; store.set('follows', f); syncNative(); render(); return; }
+  if (ds.remtime) { store.set('remTime', ds.remtime); syncNative(); return drawPanel(); }
+  if (ds.rkind) { v.draft.name = $('#remName').value; v.draft.kind = ds.rkind; return drawPanel(); }
+  if (ds.rrep) { v.draft.name = $('#remName').value; v.draft.repeat = ds.rrep; return drawPanel(); }
+  if (ds.saverem) {
+    const d = v.draft; d.name = $('#remName').value.trim() || (REM_KINDS.find(x => x[0] === d.kind) || REM_KINDS[3])[1];
+    const list = remList().filter(x => x.id !== d.id); if (!d.id) d.id = 'r' + Date.now().toString(36);
+    list.push({ id: d.id, name: d.name, kind: d.kind, date: d.date, repeat: d.repeat, tithi: d.tithi, mon: d.mon });
+    store.set('rems', list); syncNative(); S.stack.pop(); render(); return;
+  }
+  if (ds.delrem) { store.set('rems', remList().filter(x => x.id !== v.id)); syncNative(); S.stack.pop(); render(); return; }
+  if (ds.ics) {
+    try { const blob = new Blob([icsFile()], { type: 'text/calendar' }); const u = URL.createObjectURL(blob); const a2 = document.createElement('a'); a2.href = u; a2.download = 'tithi-reminders.ics'; document.body.appendChild(a2); a2.click(); a2.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); } catch (e) {}
+    return;
+  }
   if (ds.mm) { const d = new Date(Date.UTC(v.y, v.m + +ds.mm, 1)); v.y = d.getUTCFullYear(); v.m = d.getUTCMonth(); return drawPanel(); }
   if (ds.fm) { const d = new Date(Date.UTC(v.y, v.m + +ds.fm, 1)); v.y = d.getUTCFullYear(); v.m = d.getUTCMonth(); return drawPanel(); }
   if (ds.filter) { S.festFilter = ds.filter; return drawPanel(); }
@@ -1685,6 +1840,7 @@ document.addEventListener('click', e => {
 function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.id === 'remDate' && t.value) { const v = top_(); v.draft.name = $('#remName').value; v.draft.date = t.value; return drawPanel(); }
   if (t.id === 'pick' && t.value) { const [y, m, d] = t.value.split('-').map(Number); S.sel = { y, m: m - 1, d }; S.cal = { y, m: m - 1 }; render(); }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && S.panel && $('#sheet').hidden) closePanel(); });
@@ -1738,9 +1894,10 @@ if ('serviceWorker' in navigator && /vercel\.app$|^localhost$/.test(location.hos
   fillLoc();
   S.sel = todayIn(S.loc.tz); S.cal = { y: S.sel.y, m: S.sel.m }; S.festYear = S.sel.y;
   render();
+  syncNative();
   const h = (location.hash || '').slice(1);
   if (h.startsWith('vrat-') && GUIDES[h.slice(5)]) { openRoot('guides'); openGuide(h.slice(5)); }
-  else if (['fest', 'guides', 'more'].includes(h)) openRoot(h);
+  else if (['fest', 'guides', 'more', 'reminders', 'muhurat'].includes(h)) openRoot(h);
 })();
 
 </script>

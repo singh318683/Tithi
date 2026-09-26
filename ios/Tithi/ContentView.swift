@@ -1,5 +1,6 @@
 import SwiftUI
 import WebKit
+import UserNotifications
 
 /// Full-screen host for the bundled Tithi web app (Web/index.html).
 /// Everything runs offline from the app bundle; nothing is loaded from the internet.
@@ -16,8 +17,8 @@ struct TithiWebView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
-        config.websiteDataStore = .default()          // keeps chosen city & vrat ticks between launches
-        config.allowsInlineMediaPlayback = true
+        config.websiteDataStore = .default()          // keeps city, reminders & vrat ticks between launches
+        config.userContentController.add(context.coordinator, name: "tithi")   // reminders -> notifications
 
         let webView = WKWebView(frame: .zero, configuration: config)
         let bg = UIColor(named: "LaunchBackground") ?? .systemBackground
@@ -37,7 +38,13 @@ struct TithiWebView: UIViewRepresentable {
 
     func updateUIView(_ uiView: WKWebView, context: Context) {}
 
-    final class Coordinator: NSObject, WKNavigationDelegate {
+    final class Coordinator: NSObject, WKNavigationDelegate, WKScriptMessageHandler, UNUserNotificationCenterDelegate {
+
+        override init() {
+            super.init()
+            UNUserNotificationCenter.current().delegate = self
+        }
+
         // Open any outside web link in Safari instead of inside the app.
         func webView(_ webView: WKWebView,
                      decidePolicyFor navigationAction: WKNavigationAction,
@@ -50,6 +57,45 @@ struct TithiWebView: UIViewRepresentable {
                 return
             }
             decisionHandler(.allow)
+        }
+
+        // The page sends: { type: "schedule", items: [{ id, at (ms since 1970), title, body }] }
+        func userContentController(_ userContentController: WKUserContentController,
+                                   didReceive message: WKScriptMessage) {
+            guard let msg = message.body as? [String: Any],
+                  (msg["type"] as? String) == "schedule",
+                  let items = msg["items"] as? [[String: Any]] else { return }
+
+            let center = UNUserNotificationCenter.current()
+            center.removeAllPendingNotificationRequests()
+            guard !items.isEmpty else { return }
+
+            center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, _ in
+                guard granted else { return }
+                for item in items.prefix(60) {
+                    guard let id = item["id"] as? String,
+                          let at = item["at"] as? Double,
+                          let title = item["title"] as? String else { continue }
+                    let date = Date(timeIntervalSince1970: at / 1000)
+                    if date <= Date() { continue }
+
+                    let content = UNMutableNotificationContent()
+                    content.title = title
+                    content.body = (item["body"] as? String) ?? ""
+                    content.sound = .default
+
+                    let parts = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date)
+                    let trigger = UNCalendarNotificationTrigger(dateMatching: parts, repeats: false)
+                    center.add(UNNotificationRequest(identifier: id, content: content, trigger: trigger))
+                }
+            }
+        }
+
+        // Show the banner even if Tithi is open when the reminder fires.
+        func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                    willPresent notification: UNNotification,
+                                    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+            completionHandler([.banner, .sound, .list])
         }
     }
 }
