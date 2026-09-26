@@ -511,6 +511,9 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 .fit .seg button{font-size:12.5px;padding:7px 4px}
 
 .flist2 li.sechead{display:block;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);background:var(--sunk);cursor:default}
+.tmeta .solar{color:var(--kumkum);font-weight:700}
+.cal2 .ti.sfirst{color:var(--kumkum);font-weight:700;font-size:9px}
+.cal2 .cell.sol .ti{display:block!important;font-size:10px}
 /* very short screens (landscape, small phones): allow scrolling as a fallback */
 @media (max-height:560px){html,body{overflow:auto}.app{height:auto;min-height:100vh}.content{overflow:visible}.cal2{min-height:300px}}
 </style>
@@ -557,9 +560,18 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
       <label>Time zone<select id="cTz"></select></label>
       <button class="primary" id="cApply" type="button">Use this place</button>
     </div>
-    <label class="field">Month system<select id="trad">
-      <option value="p">North India · Purnimanta</option>
-      <option value="a">South & West · Amanta</option>
+    <label class="field">Calendar<select id="trad">
+      <optgroup label="Lunar">
+        <option value="p">North India · Purnimanta</option>
+        <option value="a">South & West India · Amanta</option>
+      </optgroup>
+      <optgroup label="Solar">
+        <option value="tamil">Tamil</option>
+        <option value="malayalam">Malayalam (Kerala)</option>
+        <option value="bengali">Bengali</option>
+        <option value="odia">Odia</option>
+        <option value="assamese">Assamese</option>
+      </optgroup>
     </select></label>
     <p class="foot">Times are calculated on your device from sun and moon positions (Meeus algorithms, Lahiri ayanamsa) for the chosen place. Festival dates follow standard Smarta rules; your temple or family panchang may differ by a day near tithi boundaries. If you have a health condition, are pregnant or take regular medication, talk to your doctor before a nirjala fast and choose phalahar instead.</p>
     <button type="button" class="primary wide" data-close="1">Done</button>
@@ -820,6 +832,7 @@ const FESTIVALS = [
   { n: 'Buddha Purnima', hi: 'बुद्ध पूर्णिमा', mo: 1, t: 14, ref: 'sunrise', g: 'purnima', kind: 'festival' },
   { n: 'Vat Savitri Vrat', hi: 'वट सावित्री व्रत', mo: 1, t: 29, ref: 'sunrise', g: 'vatsavitri', kind: 'vrat' },
   { n: 'Vat Purnima', hi: 'वट पूर्णिमा', mo: 2, t: 14, ref: 'sunrise', g: 'vatsavitri', kind: 'vrat' },
+  { n: 'Rath Yatra', hi: 'रथ यात्रा', mo: 3, t: 1, ref: 'sunrise', kind: 'festival' },
   { n: 'Guru Purnima', hi: 'गुरु पूर्णिमा', mo: 3, t: 14, ref: 'sunrise', g: 'purnima', kind: 'festival' },
   { n: 'Hariyali Teej', hi: 'हरियाली तीज', mo: 4, t: 2, ref: 'sunrise', g: 'teej', kind: 'vrat' },
   { n: 'Nag Panchami', hi: 'नाग पंचमी', mo: 4, t: 4, ref: 'sunrise', kind: 'festival' },
@@ -856,7 +869,7 @@ const FESTIVALS = [
 const SANKRANTI_FEST = { 9: ['Makar Sankranti', 'मकर संक्रांति'], 0: ['Mesha Sankranti (Baisakhi / Vishu)', 'मेष संक्रांति'] };
 
 // compute all observances for a Gregorian year at a location
-function yearObservances(year, loc) {
+function yearObservances(year, loc, cal) {
   const days = [];
   for (let m = 0; m < 12; m++) for (let d = 1; d <= new Date(Date.UTC(year, m + 1, 0)).getUTCDate(); d++) days.push(P.basicDay(year, m, d, loc));
   // prepend/append a few days for boundary checks
@@ -880,7 +893,8 @@ function yearObservances(year, loc) {
     }
     return res;
   }
-  for (const f of FESTIVALS) for (let b of find(f.mo, f.t, f.ref)) {
+  const extra = (typeof EAST_FEST !== 'undefined') ? EAST_FEST.filter(f => f.cals.includes(cal)).map(f => Object.assign({ kind: 'festival' }, f)) : [];
+  for (const f of [...FESTIVALS, ...extra]) for (let b of find(f.mo, f.t, f.ref)) {
     if (f.n === 'Holika Dahan') { // avoid Bhadra (Vishti karana) at pradosh when Purnima still prevails next sunrise
       const kar = Math.floor(P.elong(b.pradosh) / 6);
       const nb = days[days.indexOf(b) + 1];
@@ -917,9 +931,104 @@ function yearObservances(year, loc) {
     const norm = x => { const d = new Date(Date.UTC(x.y, x.m, x.d)); return P.basicDay(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), loc); };
     add(norm(bb), { name: fest ? fest[0] : `${P.RASHI[s.rashi]} Sankranti`, hi: fest ? fest[1] : 'संक्रांति', kind: fest ? 'festival' : 'solar', exact: s.t });
   }
+  if (typeof regionalObservances !== 'undefined') out.push(...regionalObservances(year, loc, cal));
   out.sort((a, c) => a.b.rise - c.b.rise);
   return out;
 }
+
+
+/* ---------- Solar calendars (Tamil, Malayalam, Bengali, Odia, Assamese) ---------- */
+const SOLAR = {
+  tamil: { label: 'Tamil', lunar: 'a',
+    en: ['Chithirai', 'Vaikasi', 'Aani', 'Aadi', 'Avani', 'Purattasi', 'Aippasi', 'Karthigai', 'Margazhi', 'Thai', 'Maasi', 'Panguni'],
+    nat: ['சித்திரை', 'வைகாசி', 'ஆனி', 'ஆடி', 'ஆவணி', 'புரட்டாசி', 'ஐப்பசி', 'கார்த்திகை', 'மார்கழி', 'தை', 'மாசி', 'பங்குனி'] },
+  malayalam: { label: 'Malayalam', lunar: 'a',
+    en: ['Medam', 'Edavam', 'Mithunam', 'Karkidakam', 'Chingam', 'Kanni', 'Thulam', 'Vrischikam', 'Dhanu', 'Makaram', 'Kumbham', 'Meenam'],
+    nat: ['മേടം', 'ഇടവം', 'മിഥുനം', 'കർക്കടകം', 'ചിങ്ങം', 'കന്നി', 'തുലാം', 'വൃശ്ചികം', 'ധനു', 'മകരം', 'കുംഭം', 'മീനം'] },
+  bengali: { label: 'Bengali', lunar: 'a',
+    en: ['Boishakh', 'Joishtho', 'Asharh', 'Srabon', 'Bhadro', 'Ashwin', 'Kartik', 'Ogrohayon', 'Poush', 'Magh', 'Falgun', 'Choitro'],
+    nat: ['বৈশাখ', 'জ্যৈষ্ঠ', 'আষাঢ়', 'শ্রাবণ', 'ভাদ্র', 'আশ্বিন', 'কার্তিক', 'অগ্রহায়ণ', 'পৌষ', 'মাঘ', 'ফাল্গুন', 'চৈত্র'] },
+  odia: { label: 'Odia', lunar: 'p',
+    en: ['Baisakha', 'Jyeshtha', 'Ashadha', 'Shrabana', 'Bhadraba', 'Ashwina', 'Kartika', 'Margashira', 'Pausha', 'Magha', 'Phalguna', 'Chaitra'],
+    nat: ['ବୈଶାଖ', 'ଜ୍ୟେଷ୍ଠ', 'ଆଷାଢ଼', 'ଶ୍ରାବଣ', 'ଭାଦ୍ରବ', 'ଆଶ୍ୱିନ', 'କାର୍ତ୍ତିକ', 'ମାର୍ଗଶିର', 'ପୌଷ', 'ମାଘ', 'ଫାଲ୍ଗୁନ', 'ଚୈତ୍ର'] },
+  assamese: { label: 'Assamese', lunar: 'a',
+    en: ['Bohag', 'Jeth', 'Aahar', 'Xaon', 'Bhado', 'Ahin', 'Kati', 'Aghon', 'Puh', 'Magh', 'Phagun', 'Sot'],
+    nat: ['ব’হাগ', 'জেঠ', 'আহাৰ', 'শাওণ', 'ভাদ', 'আহিন', 'কাতি', 'আঘোণ', 'পুহ', 'মাঘ', 'ফাগুন', 'চ’ত'] },
+};
+const JOVIAN = ['Prabhava','Vibhava','Shukla','Pramoduta','Prajotpatti','Angirasa','Shrimukha','Bhava','Yuva','Dhatu','Ishvara','Bahudhanya','Pramathi','Vikrama','Vrisha','Chitrabhanu','Svabhanu','Tarana','Parthiva','Vyaya','Sarvajit','Sarvadhari','Virodhi','Vikriti','Khara','Nandana','Vijaya','Jaya','Manmatha','Durmukhi','Hevilambi','Vilambi','Vikari','Sharvari','Plava','Shubhakrit','Shobhakrit','Krodhi','Vishvavasu','Parabhava','Plavanga','Kilaka','Saumya','Sadharana','Virodhikrit','Paridhavi','Pramadicha','Ananda','Rakshasa','Nala','Pingala','Kalayukti','Siddharthi','Raudri','Durmati','Dundubhi','Rudhirodgari','Raktakshi','Krodhana','Akshaya'];
+const _civ = (ms, tz) => { const d = new Date(ms + P.tzOffsetMin(ms, tz) * 60000); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate() }; };
+const _add = (o, n) => { const d = new Date(Date.UTC(o.y, o.m, o.d + n)); return { y: d.getUTCFullYear(), m: d.getUTCMonth(), d: d.getUTCDate() }; };
+const _ord = o => Date.UTC(o.y, o.m, o.d) / 86400000;
+const solarCache = new Map();
+function solarStarts(y, loc, cal) { // month-start civil dates for sankrantis around Gregorian year y
+  const key = `${loc.id}|${cal}|${y}`; if (solarCache.has(key)) return solarCache.get(key);
+  const out = [];
+  for (const s of P.sankrantis(Date.UTC(y - 1, 10, 1), Date.UTC(y + 1, 1, 1))) {
+    const D = _civ(s.t, loc.tz), b = P.basicDay(D.y, D.m, D.d, loc); let start;
+    if (cal === 'tamil') start = s.t < b.rise ? D : s.t <= b.set ? D : _add(D, 1);
+    else if (cal === 'malayalam') start = s.t < b.rise ? D : s.t <= b.rise + b.dayLen * 0.6 ? D : _add(D, 1);
+    else if (cal === 'bengali') start = _add(D, 1);
+    else if (cal === 'odia') start = s.t < b.rise ? _add(D, -1) : D;
+    else start = s.t < b.rise ? D : _add(D, 1); // assamese
+    out.push({ rashi: s.rashi, start, t: s.t });
+  }
+  solarCache.set(key, out); return out;
+}
+function solarDate(o, loc, cal) {
+  if (!SOLAR[cal]) return null;
+  const all = [...solarStarts(o.y - 1, loc, cal), ...solarStarts(o.y, loc, cal)];
+  let cur = null; for (const s of all) if (_ord(s.start) <= _ord(o) && (!cur || _ord(s.start) > _ord(cur.start))) cur = s;
+  if (!cur) return null;
+  const day = _ord(o) - _ord(cur.start) + 1, r = cur.rashi, C = SOLAR[cal];
+  let year = '';
+  const ys = (firstRashi) => { // Gregorian year in which the current solar year began
+    if (firstRashi === 0) return r <= 8 ? (o.m <= 2 ? o.y - 1 : o.y) : o.y - 1;              // starts ~April (Mesha)
+    return r >= 4 ? (o.m >= 7 ? o.y : o.y - 1) : o.y - 1;                                       // starts ~August (Simha)
+  };
+  if (cal === 'tamil') year = JOVIAN[((ys(0) - 1987) % 60 + 60) % 60] + ' year';
+  if (cal === 'malayalam') year = 'Kollam ' + (ys(4) - 824);
+  if (cal === 'bengali') year = 'Bangabda ' + (ys(0) - 593);
+  return { rashi: r, day, en: C.en[r], nat: C.nat[r], year, first: day === 1 };
+}
+// regional festivals for Gregorian year y
+function regionalObservances(y, loc, cal) {
+  if (!SOLAR[cal]) return [];
+  const out = [], starts = solarStarts(y, loc, cal).filter(s => s.start.y === y || _add(s.start, 40).y === y);
+  const add = (o, name, hi, kind = 'festival') => { if (o.y !== y) return; const b = P.basicDay(o.y, o.m, o.d, loc); out.push({ date: `${b.y}-${b.m}-${b.d}`, b, name, hi, kind }); };
+  const startOf = r => starts.find(s => s.rashi === r && (s.start.y === y));
+  const scan = (r, fn) => { const s = starts.find(x => x.rashi === r && _add(x.start, 5).y === y); if (!s) return; for (let i = 0; i < 32; i++) { const o = _add(s.start, i); const b = P.basicDay(o.y, o.m, o.d, loc); if (fn(b, o)) return o; } };
+  if (cal === 'tamil') {
+    const a = startOf(0); if (a) add(a.start, 'Puthandu (Tamil New Year)', 'புத்தாண்டு');
+    const t = startOf(9); if (t) { add(_add(t.start, -1), 'Bhogi', 'போகி'); add(t.start, 'Thai Pongal', 'தைப் பொங்கல்'); add(_add(t.start, 1), 'Mattu Pongal', 'மாட்டுப் பொங்கல்'); }
+    const ad = startOf(3); if (ad) add(_add(ad.start, 17), 'Aadi Perukku', 'ஆடிப் பெருக்கு');
+    const kd = scan(7, b => P.nakIdx(b.set) === 2); if (kd) add(kd, 'Karthigai Deepam', 'கார்த்திகை தீபம்');
+    const tp = scan(9, b => P.nakIdx(b.rise) === 7); if (tp) add(tp, 'Thaipusam', 'தைப்பூசம்');
+  }
+  if (cal === 'malayalam') {
+    const a = startOf(0); if (a) add(a.start, 'Vishu', 'വിഷു');
+    const c = startOf(4); if (c) add(c.start, 'Malayalam New Year (Chingam 1)', 'പുതുവർഷം');
+    const on = scan(4, b => P.nakIdx(b.rise) === 21 || P.nakIdx(b.noon) === 21); if (on) { add(_add(on, -1), 'Uthradom (First Onam)', 'ഉത്രാടം'); add(on, 'Thiruvonam (Onam)', 'തിരുവോണം'); }
+  }
+  if (cal === 'bengali') { const a = startOf(0); if (a) add(a.start, 'Poila Boishakh (Bengali New Year)', 'পয়লা বৈশাখ'); }
+  if (cal === 'assamese') {
+    const a = startOf(0); if (a) add(a.start, 'Bohag Bihu (Rongali)', 'ব’হাগ বিহু');
+    const k = startOf(6); if (k) add(k.start, 'Kati Bihu (Kongali)', 'কাতি বিহু');
+    const m = startOf(9); if (m) add(m.start, 'Magh Bihu (Bhogali)', 'মাঘ বিহু');
+  }
+  if (cal === 'odia') {
+    const a = startOf(0); if (a) add(a.start, 'Pana Sankranti (Odia New Year)', 'ପଣା ସଂକ୍ରାନ୍ତି');
+    const r = startOf(2); if (r) { add(_add(r.start, -1), 'Raja Parba begins', 'ରଜ ପର୍ବ'); add(r.start, 'Raja Sankranti', 'ରଜ ସଂକ୍ରାନ୍ତି'); }
+  }
+  return out;
+}
+// lunar festivals kept only for eastern calendars
+const EAST_FEST = [
+  { n: 'Maha Shashthi (Durga Puja)', hi: 'মহাষষ্ঠী', mo: 6, t: 5, ref: 'sunrise', cals: ['bengali', 'assamese', 'odia'] },
+  { n: 'Maha Saptami', hi: 'মহাসপ্তমী', mo: 6, t: 6, ref: 'sunrise', cals: ['bengali', 'assamese', 'odia'] },
+  { n: 'Kojagari Lakshmi Puja', hi: 'কোজাগরী লক্ষ্মী পূজা', mo: 6, t: 14, ref: 'nishita', cals: ['bengali', 'assamese', 'odia'] },
+  { n: 'Kali Puja', hi: 'কালী পূজা', mo: 6, t: 29, ref: 'nishita', cals: ['bengali', 'assamese', 'odia'] },
+  { n: 'Jamai Shashthi', hi: 'জামাই ষষ্ঠী', mo: 2, t: 5, ref: 'sunrise', cals: ['bengali'] },
+];
 
 /* ---------- Vivah (marriage) muhurat ---------- */
 const VIVAH = {
@@ -1392,7 +1501,8 @@ const fmtRange = (r, base) => `${fmtT(r[0], base)} – ${fmtT(r[1], base)}`;
 
 function monthLabel(b, tithi) {
   let idx = b.month.idx;
-  if (S.trad === 'p' && tithi >= 15) idx = (idx + 1) % 12;
+  const lun = SOLAR[S.trad] ? SOLAR[S.trad].lunar : S.trad;
+  if (lun === 'p' && tithi >= 15) idx = (idx + 1) % 12;
   const adh = b.month.adhika ? 'Adhik ' : '';
   return { en: adh + P.MONTHS[idx], hi: (b.month.adhika ? 'अधिक ' : '') + P.MONTHS_HI[idx] };
 }
@@ -1402,9 +1512,9 @@ const vikram = b => (b.month.idx >= 9 && b.m <= 5) ? b.y + 56 : b.y + 57;
 /* observances cache */
 const obsCache = new Map();
 function obsYear(y) {
-  const k = S.loc.id + '|' + y;
+  const k = S.loc.id + '|' + S.trad + '|' + y;
   if (!obsCache.has(k)) {
-    const list = yearObservances(y, S.loc); const byDay = new Map();
+    const list = yearObservances(y, S.loc, S.trad); const byDay = new Map();
     for (const o of list) { if (!byDay.has(o.date)) byDay.set(o.date, []); byDay.get(o.date).push(o); }
     obsCache.set(k, { list, byDay });
   }
@@ -1454,6 +1564,7 @@ function renderDay() {
   S.f = f;
   const ml = monthLabel(f, f.tithi), obs = obsOn(s), weekly = WEEKLY[f.wd], pk = paksha(f.tithi);
   const isToday = keyOf(s) === keyOf(t);
+  const sd = solarDate(s, L, S.trad);
   const x = dayExtras(s, f, obs);
   let chips = obs.map(chip).join('');
   if (x.pr) chips += `<button type="button" class="chip parana-chip" data-panel="more">Parana ${x.ekToday ? 'tomorrow ' : ''}${fmtT(x.pr.start)}–${fmtT(x.pr.end)}</button>`;
@@ -1476,7 +1587,7 @@ function renderDay() {
     <div class="hl">
       <div class="thi">${P.tithiNameHi(f.tithi)}</div>
       <div class="ten">${pk} ${P.tithiName(f.tithi)} <span>till ${fmtT(f.tEnd, s)}</span></div>
-      <div class="tmeta"><span class="dev">${ml.hi} ${pk === 'Shukla' ? 'शुक्ल' : 'कृष्ण'}</span> · ${P.NAK[f.nak]} · VS <span class="num">${vikram(f)}</span></div>
+      <div class="tmeta">${sd ? `<b class="solar">${sd.nat} ${sd.day}</b> ${sd.en}${sd.year ? ' · ' + sd.year : ''} · ${ml.en} ${pk}` : `<span class="dev">${ml.hi} ${pk === 'Shukla' ? 'शुक्ल' : 'कृष्ण'}</span> · ${P.NAK[f.nak]} · VS <span class="num">${vikram(f)}</span>`}</div>
     </div>
     <div class="hm">${moonSVG(f.elong)}<span class="num">${Math.round(f.illum * 100)}%</span></div>
   </div>
@@ -1504,16 +1615,18 @@ function renderMonth() {
     const b = P.basicDay(y, m, d, L), ti = b.ti.sunrise, o = { y, m, d };
     const ev = obsOn(o);
     const code = `${ti < 15 ? 'S' : 'K'}${(ti % 15) + 1}`;
+    const sdc = solarDate(o, L, S.trad);
     const cls = ['cell']; if (keyOf(o) === keyOf(t)) cls.push('today'); if (keyOf(o) === keyOf(S.sel)) cls.push('sel');
     if (ti === 14) cls.push('purnima'); if (ti === 29) cls.push('amavasya');
+    if (sdc) cls.push('sol');
     cells += `<button type="button" class="${cls.join(' ')}" data-pick="${keyOf(o)}" aria-label="${MONTH_FULL[m]} ${d}, ${paksha(ti)} ${P.tithiName(ti)}${ev.length ? ', ' + ev.map(e => e.name).join(', ') : ''}">
-      <span class="dn num">${d}</span><span class="ti">${ti === 14 ? '○' : ti === 29 ? '●' : code}</span>
+      <span class="dn num">${d}</span><span class="ti${sdc && sdc.first ? ' sfirst' : ''}">${sdc ? (sdc.first ? sdc.en.slice(0, 5) : sdc.day) : ti === 14 ? '○' : ti === 29 ? '●' : code}</span>
       <span class="dots">${ev.slice(0, 3).map(e => `<span class="dot ${e.kind}"></span>`).join('')}${vivahDay(y, m, d, L).windows ? '<span class="dot shubh"></span>' : ''}${remDays.has(keyOf(o)) ? '<span class="dot rem"></span>' : ''}</span></button>`;
   }
   $('#v-month').innerHTML = `
   <div class="calhead2">
     <button type="button" class="round sm" data-mstep="-1" aria-label="Previous month">‹</button>
-    <div class="ct"><b>${MONTH_FULL[m]} ${y}</b><small>${l1.en}${l1.en !== l2.en ? ' – ' + l2.en : ''}</small></div>
+    <div class="ct"><b>${MONTH_FULL[m]} ${y}</b><small>${SOLAR[S.trad] ? (() => { const a1 = solarDate({ y, m, d: 1 }, L, S.trad), a2 = solarDate({ y, m, d: n }, L, S.trad); return a1.en + (a1.en !== a2.en ? ' – ' + a2.en : '') + ' · ' + SOLAR[S.trad].label; })() : l1.en + (l1.en !== l2.en ? ' – ' + l2.en : '')}</small></div>
     <button type="button" class="round sm" data-mstep="1" aria-label="Next month">›</button>
   </div>
   <div class="cal2" style="--rows:${rows}">${cells}</div>`;
@@ -1565,6 +1678,7 @@ function pageMore(v) {
         <dt>Nakshatra</dt><dd>${P.NAK[f.nak]}<small>till ${fmtT(f.nEnd, s)}, then ${P.NAK[f.nNext]}</small></dd>
         <dt>Yoga</dt><dd>${P.YOGA[f.yoga]}<small>till ${fmtT(f.yEnd, s)}</small></dd>
         <dt>Karana</dt><dd>${P.karanaName(f.karana)}<small>till ${fmtT(f.kEnd, s)}</small></dd>
+        ${solarDate(s, S.loc, S.trad) ? (() => { const q = solarDate(s, S.loc, S.trad); return `<dt>${SOLAR[S.trad].label}</dt><dd>${q.nat} ${q.day} · ${q.en}${q.year ? '<small>' + q.year + '</small>' : ''}</dd>`; })() : ''}
         <dt>Month</dt><dd>${ml.en} · ${pk} paksha</dd>
         <dt>Samvat</dt><dd>Vikram ${vikram(f)} · Shaka ${vikram(f) - 135}</dd>
         <dt>Sun / Moon</dt><dd>${P.RASHI[f.sunRashi]} / ${P.RASHI[f.moonRashi]}</dd>
