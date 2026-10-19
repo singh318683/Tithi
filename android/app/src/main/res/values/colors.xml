@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- match the web app's ground / surface color tokens -->
+    <color name="ground">#F4EEE4</color>
+    <color name="surface">#FFFBF4</color>
+    <color name="kumkum">#B8142D</color>
+    <color name="icon_bg">#4A0716</color>
+</resources>
