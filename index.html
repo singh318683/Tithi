@@ -537,6 +537,14 @@ html,body{height:100%;overflow:hidden;overscroll-behavior:none}
 .kdosha{margin:0 0 10px;padding:8px 12px 8px 28px;background:var(--haldi-soft);border-radius:12px;color:var(--ink)}
 .kdosha.ok{background:var(--peacock-soft);list-style:none;padding-left:12px}
 .fill > .hint{margin-top:10px}
+.kplace{position:relative}
+.kplace input{font-size:16px}
+.kplaces{position:absolute;z-index:6;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px -16px rgba(0,0,0,.55);max-height:min(360px,52vh);overflow:auto;-webkit-overflow-scrolling:touch}
+.kplaces button{display:flex;align-items:center;width:100%;min-height:44px;text-align:left;border:0;border-radius:8px;background:transparent;color:var(--ink);font-weight:600;font-size:15px;line-height:1.3;padding:8px 10px;cursor:pointer}
+.kplaces button.on,.kplaces button:hover{background:var(--sunk)}
+.kplaces .kmsg{display:flex;align-items:center;min-height:44px;padding:8px 10px;color:var(--muted);font-size:13px;font-weight:500;line-height:1.35}
+.ktzline{margin:2px 0 0}
+.ktzline .linkbtn{font-size:13px;padding:0;margin-left:6px}
 </style>
 </head>
 <body>
@@ -2148,13 +2156,68 @@ function pageAddRem(v) {
     <div class="pager">${r ? '<button type="button" class="ghost danger" data-delrem="1">Delete</button>' : '<button type="button" class="ghost" data-closepanel="1">Cancel</button>'}<button type="button" class="primary" data-saverem="1">Save reminder</button></div>`, 'fit');
 }
 
-/* ---------- Kundali Milan pages (everything stays on this device) ---------- */
+/* ---------- Kundali Milan pages ----------
+   Birth details stay on this device. The only network call is the place-name
+   lookup (Open-Meteo geocoding) while searching for a town. */
 const APP_STORE_URL = 'https://apps.apple.com/us/app/tithi/id6816425574';
 const MROLE = { b: ['Bride', 'वधू', '👰'], g: ['Groom', 'वर', '🤵'] };
 const milanData = () => store.get('milan', { b: null, g: null });
+// Town, state/region, country for the built-in city list (settings still uses LOCS names).
+const LOC_REGION = {
+  lr: ['Little Rock', 'Arkansas', 'United States'],
+  nyc: ['New York', 'New York', 'United States'],
+  edison: ['Edison', 'New Jersey', 'United States'],
+  chi: ['Chicago', 'Illinois', 'United States'],
+  hou: ['Houston', 'Texas', 'United States'],
+  dal: ['Dallas', 'Texas', 'United States'],
+  atl: ['Atlanta', 'Georgia', 'United States'],
+  sf: ['San Francisco', 'California', 'United States'],
+  la: ['Los Angeles', 'California', 'United States'],
+  sea: ['Seattle', 'Washington', 'United States'],
+  tor: ['Toronto', 'Ontario', 'Canada'],
+  lon: ['London', 'England', 'United Kingdom'],
+  dxb: ['Dubai', 'Dubai', 'United Arab Emirates'],
+  sin: ['Singapore', '', 'Singapore'],
+  syd: ['Sydney', 'New South Wales', 'Australia'],
+  del: ['New Delhi', 'Delhi', 'India'],
+  bom: ['Mumbai', 'Maharashtra', 'India'],
+  vns: ['Varanasi', 'Uttar Pradesh', 'India'],
+  ujn: ['Ujjain', 'Madhya Pradesh', 'India'],
+  pat: ['Patna', 'Bihar', 'India'],
+  jai: ['Jaipur', 'Rajasthan', 'India'],
+  amd: ['Ahmedabad', 'Gujarat', 'India'],
+  ccu: ['Kolkata', 'West Bengal', 'India'],
+  hyd: ['Hyderabad', 'Telangana', 'India'],
+  blr: ['Bengaluru', 'Karnataka', 'India'],
+  maa: ['Chennai', 'Tamil Nadu', 'India'],
+  ktm: ['Kathmandu', 'Bagmati', 'Nepal'],
+};
+function locHit(l) {
+  const meta = LOC_REGION[l.id] || [String(l.name).split(',')[0], '', ''];
+  const [name, admin1, country] = meta;
+  return { name, admin1, country, label: [name, admin1, country].filter(Boolean).join(', '), lat: l.lat, lon: l.lon, tz: l.tz, city: l.id };
+}
 function milanBlank() {
   const l = S.loc && S.loc.id !== 'custom' ? S.loc : LOCS.find(x => x.id === 'del');
-  return { name: '', mode: 'birth', date: '', time: '', city: l.id, tz: l.tz, nak: 0, pada: 1 };
+  const hit = locHit(l);
+  return { name: '', mode: 'birth', date: '', time: '', city: l.id, place: hit.label, lat: l.lat, lon: l.lon, tz: l.tz, nak: 0, pada: 1 };
+}
+// Old saves store a city id ('jai', 'other', …) and a time zone, with no place name.
+function milanFromSaved(rec) {
+  if (!rec) return milanBlank();
+  const d = Object.assign(milanBlank(), rec);
+  d.tzOpen = false;
+  if (!rec.place) {
+    const l = LOCS.find(x => x.id === rec.city);
+    if (l) {
+      const hit = locHit(l);
+      d.place = hit.label; d.city = l.id;
+      if (rec.lat == null) d.lat = l.lat;
+      if (rec.lon == null) d.lon = l.lon;
+      d.tz = rec.tz || l.tz;
+    } else d.place = '';
+  }
+  return d;
 }
 const nakLabel = p => `${P.NAK[p.nak]} pada ${p.pada} · ${P.RASHI[p.rashi]}`;
 const nakLabelHi = p => `${K.NAK_HI[p.nak]} · ${K.RASHI_HI[p.rashi]}`;
@@ -2162,8 +2225,10 @@ function milanTZs() { let z = []; try { z = Intl.supportedValuesOf('timeZone'); 
 
 function milanWhen(rec) {
   if (rec.mode === 'nak') return 'Entered by nakshatra';
-  const [y, m, d] = rec.date.split('-').map(Number), l = LOCS.find(x => x.id === rec.city);
-  return `Born ${d} ${MON[m - 1]} ${y}${rec.time ? ', ' + rec.time : ''} · ${esc(l ? l.name : rec.tz)}`;
+  const [y, m, d] = rec.date.split('-').map(Number);
+  const l = !rec.place && LOCS.find(x => x.id === rec.city);
+  const where = rec.place || (l ? locHit(l).label : rec.tz);
+  return `Born ${d} ${MON[m - 1]} ${y}${rec.time ? ', ' + rec.time : ''} · ${esc(where)}`;
 }
 function pageMilan(v) {
   const d = milanData(), pb = K.person(d.b), pg = K.person(d.g);
@@ -2173,19 +2238,150 @@ function pageMilan(v) {
     <div class="ghead sm"><span class="dev">कुंडली मिलान</span><span class="sub">Ashtakoot guna milan · 36 gunas</span></div>
     <div class="kpair fill">${tile('b')}${tile('g')}</div>
     <button type="button" class="primary wide" data-mgo="1" ${pb && pg ? '' : 'disabled'}>Match kundali</button>
-    <p class="hint">Uses each person's Moon nakshatra and rashi at birth (Lahiri ayanamsa), worked out on this phone. Nothing is sent anywhere. ${d.b || d.g ? '<button type="button" class="linkbtn" data-mclear="1">Clear details</button>' : ''}</p>`, 'fit');
+    <p class="hint">Uses each person's Moon nakshatra and rashi at birth (Lahiri ayanamsa), worked out on this phone. Birth details stay on this device; only the typed place name is sent to Open-Meteo to look up the town. ${d.b || d.g ? '<button type="button" class="linkbtn" data-mclear="1">Clear details</button>' : ''}</p>`, 'fit');
 }
 
+const PLACE_OFFLINE = 'No internet: pick from the list or set the time zone manually';
+let placeHits = [], placeHi = -1, placeSeq = 0, placeTimer = 0, placeAbort = null;
+function foldPlace(s) { return String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+function sameTown(a, b) {
+  const na = foldPlace(a.name), nb = foldPlace(b.name);
+  if (!na || !nb) return false;
+  const alias = (x, y) => (na.includes(x) && nb.includes(y)) || (na.includes(y) && nb.includes(x));
+  const closeName = na === nb || na.startsWith(nb) || nb.startsWith(na) ||
+    alias('new delhi', 'delhi') || alias('bengaluru', 'bangalore') || alias('mumbai', 'bombay') ||
+    alias('kolkata', 'calcutta') || alias('chennai', 'madras') || alias('san francisco bay', 'san francisco');
+  if (!closeName) return false;
+  if (a.lat != null && b.lat != null) return Math.abs(+a.lat - +b.lat) < 0.75 && Math.abs(+a.lon - +b.lon) < 0.75;
+  return !!foldPlace(a.country) && foldPlace(a.country) === foldPlace(b.country);
+}
+function localPlaceHits(q) {
+  const query = foldPlace(q);
+  if (query.length < 2) return [];
+  return LOCS.map(locHit).map(h => {
+    const town = foldPlace(h.name), label = foldPlace(h.label);
+    let score = 0;
+    if (town === query) score = 300;
+    else if (town.startsWith(query) || label.startsWith(query)) score = 200;
+    else if (query.length >= 3 && (town.includes(query) || label.includes(query))) score = 100;
+    return { h, score };
+  }).filter(x => x.score).sort((a, b) => b.score - a.score || a.h.label.localeCompare(b.h.label)).map(x => x.h);
+}
+function apiPlaceHits(results, q) {
+  const query = foldPlace(q), best = new Map();
+  for (const r of results || []) {
+    if (r.latitude == null || r.longitude == null || !r.name) continue;
+    const folded = foldPlace(r.name);
+    // Population is the main signal inside a match band, so "jaun" ranks Jaunpur
+    // above hamlets that are spelled exactly Jaun. Exact match is only a small boost.
+    const pop = Math.log10((r.population || 0) + 10) * 20;
+    const tier = folded === query ? 3 : folded.startsWith(query) ? 2 : folded.includes(query) ? 1 : 0;
+    const score = (tier === 3 ? 115 : tier === 2 ? 100 : tier === 1 ? 60 : 10) + pop;
+    const hit = { name: r.name, admin1: r.admin1 || '', country: r.country || '', label: [r.name, r.admin1, r.country].filter(Boolean).join(', '), lat: r.latitude, lon: r.longitude, tz: r.timezone || '', city: '', score, tier };
+    const key = foldPlace(hit.name) + '|' + foldPlace(hit.admin1) + '|' + foldPlace(hit.country);
+    const prev = best.get(key);
+    if (!prev || hit.score > prev.score) best.set(key, hit);
+  }
+  let list = [...best.values()];
+  const prefixed = list.filter(h => h.tier >= 2);
+  if (prefixed.length) list = prefixed; // "jaun" keeps Jaunpur, drops fuzzy hits like Yaoundé
+  else { const contained = list.filter(h => h.tier >= 1); if (contained.length) list = contained; }
+  list.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+  return list;
+}
+function mergePlaces(local, api) {
+  const out = [];
+  for (const h of [...local, ...api]) { if (out.length >= 8) break; if (!out.some(x => sameTown(x, h))) out.push(h); }
+  return out;
+}
+function hidePlaceList() {
+  const list = $('#mPlaceList'), inp = $('#mPlace');
+  if (list) { list.hidden = true; list.innerHTML = ''; }
+  if (inp) { inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); }
+  placeHits = []; placeHi = -1;
+}
+function paintPlaceHi() {
+  const list = $('#mPlaceList'), inp = $('#mPlace'); if (!list) return;
+  [...list.querySelectorAll('button')].forEach((b, i) => {
+    const on = i === placeHi; b.classList.toggle('on', on); b.setAttribute('aria-selected', on ? 'true' : 'false');
+    if (!on) return;
+    if (inp) inp.setAttribute('aria-activedescendant', b.id);
+    const top = b.offsetTop, bottom = top + b.offsetHeight;
+    if (top < list.scrollTop) list.scrollTop = top;
+    else if (bottom > list.scrollTop + list.clientHeight) list.scrollTop = bottom - list.clientHeight;
+  });
+}
+function renderPlaceList(hits, note) {
+  const keep = placeHits[placeHi] && placeHits[placeHi].label;
+  placeHits = hits;
+  placeHi = -1;
+  if (hits.length) { const i = keep ? hits.findIndex(h => h.label === keep) : 0; placeHi = i >= 0 ? i : 0; }
+  const list = $('#mPlaceList'), inp = $('#mPlace');
+  if (!list || !inp) return;
+  if (!hits.length && !note) { hidePlaceList(); return; }
+  list.hidden = false; inp.setAttribute('aria-expanded', 'true');
+  list.innerHTML = (note ? `<div class="kmsg">${esc(note)}</div>` : '') + hits.map((h, i) => `<button type="button" role="option" id="mPlaceOpt${i}" data-mplace="${i}" aria-selected="${i === placeHi ? 'true' : 'false'}" class="${i === placeHi ? 'on' : ''}">${esc(h.label)}</button>`).join('');
+  if (placeHi >= 0) inp.setAttribute('aria-activedescendant', 'mPlaceOpt' + placeHi);
+}
+function revealTz() {
+  const v = top_(); if (v && v.draft) v.draft.tzOpen = true;
+  const box = $('#mTzBox'); if (box) box.hidden = false;
+}
+function schedulePlaceSearch(raw, immediate) {
+  clearTimeout(placeTimer);
+  if (placeAbort) { placeAbort.abort(); placeAbort = null; }
+  const query = String(raw || '').trim();
+  if (query.length < 2) { hidePlaceList(); return; }
+  const local = localPlaceHits(query);
+  renderPlaceList(local, '');
+  const seq = ++placeSeq;
+  const run = () => fetchPlaces(query, seq);
+  if (immediate) run(); else placeTimer = setTimeout(run, 300);
+}
+async function fetchPlaces(query, seq) {
+  const offline = () => { if (seq !== placeSeq) return; renderPlaceList(localPlaceHits(query), PLACE_OFFLINE); revealTz(); };
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) { offline(); return; }
+  const ctrl = new AbortController(); placeAbort = ctrl;
+  try {
+    // Wider than 10: for "jaun" the API's first page is Yaoundé and hamlets named Jaun.
+    // Jaunpur, Uttar Pradesh sits just outside that page. We re-rank and show 8.
+    const url = 'https://geocoding-api.open-meteo.com/v1/search?name=' + encodeURIComponent(query) + '&count=100&language=en&format=json';
+    const res = await fetch(url, { signal: ctrl.signal });
+    if (!res.ok) throw new Error(String(res.status));
+    const data = await res.json();
+    if (seq !== placeSeq) return;
+    const inp = $('#mPlace');
+    if (!inp || inp.value.trim() !== query || document.activeElement !== inp) return;
+    const hits = mergePlaces(localPlaceHits(query), apiPlaceHits(data.results, query));
+    renderPlaceList(hits, hits.length ? '' : 'No matching towns');
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    offline();
+  }
+}
+function choosePlace(hit) {
+  const v = top_(); if (!v || !v.draft || !hit) return;
+  const d = v.draft;
+  d.place = hit.label; d.placePicked = hit.label; d.lat = hit.lat; d.lon = hit.lon;
+  if (hit.tz) d.tz = hit.tz;
+  d.city = hit.city || 'geo'; d.tzOpen = false;
+  const name = $('#mName'); if (name) d.name = name.value;
+  const date = $('#mDate'); if (date) d.date = date.value;
+  const time = $('#mTime'); if (time) d.time = time.value;
+  placeSeq++; clearTimeout(placeTimer);
+  drawPanel();
+}
 function pageMilanPerson(v) {
   const r = v.role, [en, hi] = MROLE[r];
-  const d = v.draft || (v.draft = Object.assign(milanBlank(), milanData()[r] || {}));
+  const d = v.draft || (v.draft = milanFromSaved(milanData()[r]));
   const p = K.person(d);
-  const cityOpts = LOCS.map(l => `<option value="${l.id}" ${d.city === l.id ? 'selected' : ''}>${esc(l.name)}</option>`).join('') + `<option value="other" ${d.city === 'other' ? 'selected' : ''}>Other place (choose time zone)…</option>`;
+  const tzList = milanTZs(); if (d.tz && !tzList.includes(d.tz)) tzList.unshift(d.tz);
   const birth = `
-      <label class="field">Date of birth<input id="mDate" type="date" value="${d.date}" max="2100-12-31"></label>
-      <label class="field">Time of birth<input id="mTime" type="time" value="${d.time}"></label>
-      <label class="field">Place of birth<select id="mCity">${cityOpts}</select></label>
-      ${d.city === 'other' ? `<label class="field">Time zone of the birth place<select id="mTz">${milanTZs().map(z => `<option ${z === d.tz ? 'selected' : ''}>${z}</option>`).join('')}</select></label>` : ''}`;
+      <label class="field">Date of birth<input id="mDate" type="date" value="${esc(d.date)}" max="2100-12-31"></label>
+      <label class="field">Time of birth<input id="mTime" type="time" value="${esc(d.time)}"></label>
+      <div class="field kplace">Place of birth<input id="mPlace" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="mPlaceList" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="search" maxlength="80" placeholder="Type a town, e.g. Jaunpur" value="${esc(d.place || '')}"><div class="kplaces" id="mPlaceList" role="listbox" hidden></div></div>
+      <p class="hint ktzline" id="mTzNote">Time zone: <b>${esc(d.tz || 'not set')}</b> <button type="button" class="linkbtn" data-mtz="1">change time zone</button></p>
+      <label class="field" id="mTzBox" ${d.tzOpen ? '' : 'hidden'}>Time zone of the birth place<select id="mTz">${tzList.map(z => `<option ${z === d.tz ? 'selected' : ''}>${esc(z)}</option>`).join('')}</select></label>`;
   const nak = `
       <label class="field">Birth nakshatra<select id="mNak">${P.NAK.map((n, i) => `<option value="${i}" ${+d.nak === i ? 'selected' : ''}>${n} · ${K.NAK_HI[i]}</option>`).join('')}</select></label>
       <label class="field">Pada (charan)<select id="mPada">${[1, 2, 3, 4].map(i => `<option ${+d.pada === i ? 'selected' : ''}>${i}</option>`).join('')}</select></label>`;
@@ -2225,7 +2421,7 @@ function pageMilanResult(v) {
     <div class="fill">
             ${notes ? `<ul class="why kdosha">      ${notes}</ul>` : '<ul class="why kdosha ok"><li class="good"><b>No Nadi or Bhakoot dosha.</b></li></ul>'}
       <ul class="flist2 klist">${m.kootas.map(k => `<li class="${k.pts === 0 ? 'zero' : ''}"><span class="n">${k.name} <span class="dev">${k.hi}</span><small>${k.meaning}</small><small class="kd">${esc(k.detail)}${k.key === 'vashya' && unsure ? ' · depends on exact degree' : ''}</small></span><span class="t num">${fmtPts(k.pts)}/${k.max}</span></li>`).join('')}</ul>
-      <p class="hint">Details show the groom first, then the bride. Under 18: not recommended · 18–24½: average · 25–32½: good · 33+: excellent. Counted the North Indian way (Drik Panchang tables, groom's chart first). Cancelled doshas are noted but no points are added back. This is a guide only and does not check Mangal dosha or the full kundli; families should consult a pandit before deciding. Worked out on this phone; nothing is sent anywhere.</p>
+      <p class="hint">Details show the groom first, then the bride. Under 18: not recommended · 18–24½: average · 25–32½: good · 33+: excellent. Counted the North Indian way (Drik Panchang tables, groom's chart first). Cancelled doshas are noted but no points are added back. This is a guide only and does not check Mangal dosha or the full kundli; families should consult a pandit before deciding. Worked out on this phone. Birth details stay on this device; only the typed place name is sent to Open-Meteo to look up the town.</p>
     </div>
     <div class="pager"><button type="button" class="ghost" data-closepanel="1">‹ Edit</button><button type="button" class="primary" data-mshare="1">Share result</button></div>`, 'fit');
 }
@@ -2246,25 +2442,77 @@ function milanShare(btn) {
   else copy();
 }
 function milanClick(t, ds, v) { // returns true when handled
+  if (ds.mplace != null) { if (v) choosePlace(placeHits[+ds.mplace]); return true; }
+  if (ds.mtz) {
+    if (!v || !v.draft) return true;
+    v.draft.tzOpen = true;
+    const name = $('#mName'); if (name) v.draft.name = name.value;
+    const place = $('#mPlace'); if (place) v.draft.place = place.value;
+    const date = $('#mDate'); if (date) v.draft.date = date.value;
+    const time = $('#mTime'); if (time) v.draft.time = time.value;
+    drawPanel(); return true;
+  }
   if (ds.mperson) { push({ k: 'milanp', role: ds.mperson }); return true; }
   if (ds.mgo) { push({ k: 'milanres' }); return true; }
   if (ds.mclear) { store.set('milan', { b: null, g: null }); drawPanel(); return true; }
-  if (ds.mmode) { v.draft.name = $('#mName').value; v.draft.mode = ds.mmode; drawPanel(); return true; }
-  if (ds.msave) { v.draft.name = $('#mName').value.trim(); const d = milanData(); d[v.role] = v.draft; store.set('milan', d); S.stack.pop(); drawPanel(); return true; }
+  if (ds.mmode) {
+    v.draft.name = $('#mName').value; v.draft.mode = ds.mmode;
+    const place = $('#mPlace'); if (place) v.draft.place = place.value;
+    drawPanel(); return true;
+  }
+  if (ds.msave) {
+    const name = $('#mName'); if (name) v.draft.name = name.value.trim();
+    const place = $('#mPlace'); if (place) v.draft.place = place.value.trim();
+    const date = $('#mDate'); if (date) v.draft.date = date.value;
+    const time = $('#mTime'); if (time) v.draft.time = time.value;
+    const saved = Object.assign({}, v.draft); delete saved.tzOpen; delete saved.placePicked;
+    const d = milanData(); d[v.role] = saved; store.set('milan', d); S.stack.pop(); drawPanel(); return true;
+  }
   if (ds.mshare) { milanShare(t); return true; }
   return false;
 }
 function milanChange(t) { // returns true when handled
-  const v = top_(); if (!v || v.k !== 'milanp' || !/^m(Date|Time|City|Tz|Nak|Pada)$/.test(t.id)) return false;
+  const v = top_(); if (!v || v.k !== 'milanp' || !/^m(Date|Time|Tz|Nak|Pada)$/.test(t.id)) return false;
   const d = v.draft; d.name = $('#mName').value;
+  const place = $('#mPlace'); if (place) d.place = place.value;
   if (t.id === 'mDate') d.date = t.value;
   if (t.id === 'mTime') d.time = t.value;
-  if (t.id === 'mCity') { d.city = t.value; const l = LOCS.find(x => x.id === t.value); if (l) d.tz = l.tz; }
-  if (t.id === 'mTz') d.tz = t.value;
+  if (t.id === 'mTz') { d.tz = t.value; d.tzOpen = true; }
   if (t.id === 'mNak') d.nak = +t.value;
   if (t.id === 'mPada') d.pada = +t.value;
   drawPanel(); return true;
 }
+document.addEventListener('input', e => {
+  if (!e.target || e.target.id !== 'mPlace') return;
+  const v = top_(); if (!v || v.k !== 'milanp' || !v.draft) return;
+  const d = v.draft;
+  d.place = e.target.value;
+  if (d.placePicked && e.target.value.trim() !== d.placePicked) { d.placePicked = ''; d.lat = null; d.lon = null; d.city = 'geo'; }
+  schedulePlaceSearch(e.target.value);
+});
+// Keep the field focused while a row is pressed, so iOS Safari does not blur-and-dismiss the list before the tap lands.
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('#mPlaceList button')) e.preventDefault(); });
+document.addEventListener('keydown', e => {
+  const inp = e.target; if (!inp || inp.id !== 'mPlace') return;
+  const list = $('#mPlaceList');
+  const open = list && !list.hidden && placeHits.length;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!open) { if (e.key === 'ArrowDown') schedulePlaceSearch(inp.value, true); return; }
+    placeHi = e.key === 'ArrowDown' ? (placeHi + 1) % placeHits.length : (placeHi - 1 + placeHits.length) % placeHits.length;
+    paintPlaceHi();
+  } else if (e.key === 'Enter' && open && placeHits[placeHi]) { e.preventDefault(); choosePlace(placeHits[placeHi]); }
+  else if (e.key === 'Escape' && list && !list.hidden) { e.preventDefault(); e.stopPropagation(); hidePlaceList(); }
+}, true);
+document.addEventListener('focusout', e => {
+  if (!e.target || e.target.id !== 'mPlace') return;
+  setTimeout(() => {
+    const list = $('#mPlaceList'); if (!list || list.hidden) return;
+    const ae = document.activeElement;
+    if (ae && ae.closest && (ae.id === 'mPlace' || ae.closest('#mPlaceList'))) return;
+    hidePlaceList();
+  }, 200);
+});
 
 function drawPanel() {
   const v = top_(); if (!v) return;
