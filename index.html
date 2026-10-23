@@ -1864,12 +1864,6 @@ function renderDay() {
     <div class="hm">${moonSVG(f.elong)}<span class="num">${Math.round(f.illum * 100)}%</span></div>
   </div>
   ${chips ? `<div class="chiprow">${chips}</div>` : ''}
-  <div class="strip num">
-    <div><small>Sunrise</small><b>${fmtT(f.rise)}</b></div>
-    <div><small>Sunset</small><b>${fmtT(f.set)}</b></div>
-    <div><small>Moonrise</small><b>${f.moonrise ? fmtT(f.moonrise) : '—'}</b></div>
-    <div class="bad"><small>Rahu kaal</small><b>${fmtT(f.rahu[0])}</b></div>
-  </div>
   ${next ? `<button type="button" class="nextrow" data-date="${keyOf(next[1])}"><span class="dot ${next[2].kind}"></span><span class="nx">Next: <b>${esc(next[2].name)}</b></span><span class="num nd">${next[0] === 1 ? 'Tomorrow' : MON[next[1].m] + ' ' + next[1].d}</span></button>` : ''}`;
 }
 
